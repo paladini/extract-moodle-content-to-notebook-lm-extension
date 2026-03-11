@@ -1,0 +1,25 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (if ever needed)
+node_modules/
+package-lock.json
+
+# Build artifacts
+*.zip
+*.crx
+*.pem
+
+# Test/sample pages
+pages/
+
+# Windsurf plans
+.windsurf/

@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Moodle Content Extractor for NotebookLM",
+  "short_name": "Moodle Extractor",
+  "version": "1.0.0",
+  "description": "Extract academic content from Moodle and export it as Markdown optimized for Google NotebookLM.",
+  "author": "Fernando Paladini",
+  "homepage_url": "https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension",
+  "permissions": ["storage", "activeTab", "scripting", "downloads"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Moodle Extractor"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
