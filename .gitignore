@@ -14,6 +14,7 @@ node_modules/
 package-lock.json
 
 # Build artifacts
+dist/
 *.zip
 *.crx
 *.pem

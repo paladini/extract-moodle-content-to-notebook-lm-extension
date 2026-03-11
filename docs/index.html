@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moodle Extractor for NotebookLM</title>
+  <meta name="description" content="Browse Moodle. Export Markdown. Study smarter with Google NotebookLM. A free, open-source Chrome extension." />
+  <meta property="og:title" content="Moodle Extractor for NotebookLM" />
+  <meta property="og:description" content="Browse Moodle. Export Markdown. Study smarter with Google NotebookLM." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── NAV ──────────────────────────────────────────────── -->
+  <nav class="nav" id="navbar">
+    <div class="nav__inner container">
+      <a href="#" class="nav__logo">
+        <span class="logo-icon">📚</span>
+        <span>Moodle Extractor</span>
+      </a>
+      <ul class="nav__links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#install">Install</a></li>
+        <li>
+          <a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension"
+             class="btn btn--ghost btn--sm" target="_blank" rel="noopener">
+            GitHub
+          </a>
+        </li>
+      </ul>
+      <button class="nav__burger" id="burger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─────────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="hero__bg-grid"></div>
+    <div class="hero__orb hero__orb--1"></div>
+    <div class="hero__orb hero__orb--2"></div>
+    <div class="container hero__inner">
+      <div class="hero__badge">
+        <span class="badge-dot"></span>
+        Free &amp; Open Source · Manifest V3
+      </div>
+      <h1 class="hero__title">
+        From&nbsp;Moodle to&nbsp;NotebookLM<br />
+        <span class="gradient-text">in&nbsp;seconds.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Browse your courses as usual. The extension silently captures every page
+        and exports clean, structured Markdown — perfectly optimized for
+        <strong>Google NotebookLM</strong>.
+      </p>
+      <div class="hero__cta">
+        <a href="#install" class="btn btn--primary btn--lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Install Extension
+        </a>
+        <a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension"
+           class="btn btn--outline btn--lg" target="_blank" rel="noopener">
+          View on GitHub
+        </a>
+      </div>
+      <div class="hero__stats">
+        <div class="stat">
+          <span class="stat__value">0 deps</span>
+          <span class="stat__label">Zero dependencies</span>
+        </div>
+        <div class="stat__sep"></div>
+        <div class="stat">
+          <span class="stat__value">MV3</span>
+          <span class="stat__label">Manifest V3</span>
+        </div>
+        <div class="stat__sep"></div>
+        <div class="stat">
+          <span class="stat__value">MIT</span>
+          <span class="stat__label">Open license</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__scroll-hint">
+      <span>scroll</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </header>
+
+  <!-- ─── WORKFLOW ──────────────────────────────────────────── -->
+  <section class="workflow section">
+    <div class="container">
+      <div class="workflow__steps">
+        <div class="workflow__step">
+          <div class="step__number">01</div>
+          <div class="step__content">
+            <h3>Browse normally</h3>
+            <p>Navigate your Moodle courses as you always do. The extension runs silently in the background.</p>
+          </div>
+        </div>
+        <div class="workflow__arrow">→</div>
+        <div class="workflow__step">
+          <div class="step__number">02</div>
+          <div class="step__content">
+            <h3>Content captured</h3>
+            <p>Every page is detected and structured automatically by course and module.</p>
+          </div>
+        </div>
+        <div class="workflow__arrow">→</div>
+        <div class="workflow__step">
+          <div class="step__number">03</div>
+          <div class="step__content">
+            <h3>Export Markdown</h3>
+            <p>One click exports a clean <code>.md</code> file per course, ready for NotebookLM.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FEATURES ─────────────────────────────────────────── -->
+  <section class="features section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">Features</p>
+        <h2 class="section-title">Everything you need to study smarter</h2>
+        <p class="section-subtitle">
+          Built with pure JavaScript — no build step, no bloat, no tracking.
+        </p>
+      </div>
+      <div class="features__grid">
+
+        <div class="feature-card">
+          <div class="feature-card__icon">🔄</div>
+          <h3>Auto-capture</h3>
+          <p>Content is captured in the background as you navigate. No manual copy-paste needed.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon">🗂️</div>
+          <h3>Course &amp; module detection</h3>
+          <p>Automatically groups content by course (breadcrumb) and module (URL/heading).</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon">📄</div>
+          <h3>Per-course export</h3>
+          <p>Export each course as a separate <code>.md</code> file or export everything at once.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon">🤖</div>
+          <h3>NotebookLM-optimized</h3>
+          <p>Structured H1 → H2 hierarchy so NotebookLM creates meaningful topics out of the box.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon">🎬</div>
+          <h3>Video &amp; resource extraction</h3>
+          <p>Captures YouTube/Vimeo embeds and file attachments (PDF, DOCX, PPTX, etc.).</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon">🛡️</div>
+          <h3>URL-based filtering</h3>
+          <p>Only captures pages matching your configured Moodle instance. Nothing else.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ─────────────────────────────────────── -->
+  <section class="how-it-works section" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">How it works</p>
+        <h2 class="section-title">Under the hood</h2>
+      </div>
+      <div class="arch__grid">
+        <div class="arch__card">
+          <div class="arch__icon">📋</div>
+          <h4>content.js</h4>
+          <p>Content script that detects Moodle DOM signatures, extracts breadcrumb, headings, and page body on every navigation.</p>
+        </div>
+        <div class="arch__card">
+          <div class="arch__icon">⚙️</div>
+          <h4>background.js</h4>
+          <p>Service worker that stores captured data in <code>chrome.storage.local</code>, deduplicates by URL, and assembles Markdown on export.</p>
+        </div>
+        <div class="arch__card">
+          <div class="arch__icon">🖼️</div>
+          <h4>popup.html</h4>
+          <p>Simple popup UI for configuring your Moodle URL, starting/stopping capture, and triggering per-course or bulk exports.</p>
+        </div>
+      </div>
+      <div class="export-preview">
+        <div class="export-preview__header">
+          <span class="dot dot--red"></span>
+          <span class="dot dot--yellow"></span>
+          <span class="dot dot--green"></span>
+          <span class="export-preview__filename">databases-course.md</span>
+        </div>
+        <pre class="export-preview__code"><span class="token-h1"># Databases 101</span>
+
+<span class="token-h2">## Module: 1.1 Introduction to Databases</span>
+<span class="token-meta">**Type:** lesson | **Captured at:** 2026-03-11T02:30:00.000Z</span>
+
+Introduction to relational databases and SQL...
+
+<span class="token-h3">### Videos</span>
+- [What is a Database?](https://youtube.com/...)
+
+<span class="token-h3">### Resources</span>
+- [Lecture Slides](https://moodle.example.com/pluginfile.php/...)
+
+---
+
+<span class="token-h2">## Module: 1.2 Relational Model</span>
+...</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── INSTALL ───────────────────────────────────────────── -->
+  <section class="install section" id="install">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-tag">Installation</p>
+        <h2 class="section-title">Get started in 60 seconds</h2>
+      </div>
+      <div class="install__grid">
+        <div class="install__steps">
+          <div class="install__step">
+            <div class="install__step-num">1</div>
+            <div>
+              <h4>Download the latest release</h4>
+              <p>Go to the <a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension/releases" target="_blank" rel="noopener">GitHub Releases</a> page and download the latest <code>.zip</code>. Extract it anywhere.</p>
+            </div>
+          </div>
+          <div class="install__step">
+            <div class="install__step-num">2</div>
+            <div>
+              <h4>Open the Extensions page</h4>
+              <p>In Chrome, Edge, or Brave, navigate to <code>chrome://extensions</code>.</p>
+            </div>
+          </div>
+          <div class="install__step">
+            <div class="install__step-num">3</div>
+            <div>
+              <h4>Enable Developer Mode</h4>
+              <p>Toggle <strong>Developer mode</strong> on (top-right corner).</p>
+            </div>
+          </div>
+          <div class="install__step">
+            <div class="install__step-num">4</div>
+            <div>
+              <h4>Load the extension</h4>
+              <p>Click <strong>Load unpacked</strong> and select the extracted folder. Done! 🎉</p>
+            </div>
+          </div>
+        </div>
+        <div class="install__browser-support">
+          <h4>Supported browsers</h4>
+          <div class="browser-list">
+            <div class="browser-item">
+              <span class="browser-icon">🌐</span>
+              <span>Google Chrome</span>
+              <span class="browser-badge">✓</span>
+            </div>
+            <div class="browser-item">
+              <span class="browser-icon">🔷</span>
+              <span>Microsoft Edge</span>
+              <span class="browser-badge">✓</span>
+            </div>
+            <div class="browser-item">
+              <span class="browser-icon">🦁</span>
+              <span>Brave</span>
+              <span class="browser-badge">✓</span>
+            </div>
+          </div>
+          <p class="browser-note">Any Chromium-based browser supporting Manifest V3.</p>
+          <a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension/releases"
+             class="btn btn--primary" target="_blank" rel="noopener">
+            Download Latest Release
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ──────────────────────────────────────────────── -->
+  <section class="cta-section section">
+    <div class="cta-section__orb"></div>
+    <div class="container cta-section__inner">
+      <h2>Ready to study smarter?</h2>
+      <p>Free, open-source, and privacy-friendly. No accounts, no cloud, no tracking.</p>
+      <div class="cta-section__btns">
+        <a href="#install" class="btn btn--primary btn--lg">Install now</a>
+        <a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension"
+           class="btn btn--outline btn--lg" target="_blank" rel="noopener">Star on GitHub ⭐</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ───────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <span class="logo-icon">📚</span>
+        <span>Moodle Extractor</span>
+      </div>
+      <p class="footer__copy">
+        Built with ❤️ by
+        <a href="https://github.com/paladini" target="_blank" rel="noopener">Fernando Paladini</a>.
+        Released under the <a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>.
+      </p>
+      <ul class="footer__links">
+        <li><a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+        <li><a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension/issues" target="_blank" rel="noopener">Issues</a></li>
+        <li><a href="https://github.com/paladini/extract-moodle-content-to-notebook-lm-extension/releases" target="_blank" rel="noopener">Releases</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
