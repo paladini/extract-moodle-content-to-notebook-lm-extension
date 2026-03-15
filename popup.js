@@ -152,16 +152,35 @@ function renderCourses(courses) {
   $courseList.innerHTML = ids.map((id) => {
     const c = courses[id];
     const n = Object.keys(c.modules).length;
+    const moduleEntries = Object.values(c.modules);
+    const previewHtml = moduleEntries.map((mod) => {
+      const snippet = escapeHtml((mod.content || '').substring(0, 200));
+      return `<div class="preview-module">
+        <div class="preview-module-name">${escapeHtml(mod.moduleName)}</div>
+        <div class="preview-module-content">${snippet}${mod.content.length > 200 ? '...' : ''}</div>
+      </div>`;
+    }).join('');
     return `
-      <div class="course-item">
-        <span class="course-name" title="${escapeHtml(c.name)}">${escapeHtml(c.name)}</span>
-        <span class="course-badge">${n} module${n !== 1 ? 's' : ''}</span>
-        <div class="course-actions">
-          <button class="btn-export-course" data-id="${id}">Export</button>
-          <button class="btn-clear-course" data-id="${id}" data-name="${escapeHtml(c.name)}">Clear</button>
+      <div class="course-item-wrapper">
+        <div class="course-item">
+          <span class="course-name" title="${escapeHtml(c.name)}">${escapeHtml(c.name)}</span>
+          <span class="course-badge">${n} module${n !== 1 ? 's' : ''}</span>
+          <div class="course-actions">
+            <button class="btn-preview-course" data-id="${id}" title="Preview content">Preview</button>
+            <button class="btn-export-course" data-id="${id}">Export</button>
+            <button class="btn-clear-course" data-id="${id}" data-name="${escapeHtml(c.name)}">Clear</button>
+          </div>
         </div>
+        <div class="course-preview" data-preview-id="${id}">${previewHtml}</div>
       </div>`;
   }).join('');
+
+  $courseList.querySelectorAll('.btn-preview-course').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const panel = $courseList.querySelector(`.course-preview[data-preview-id="${btn.dataset.id}"]`);
+      if (panel) panel.classList.toggle('open');
+    });
+  });
 
   $courseList.querySelectorAll('.btn-export-course').forEach((btn) => {
     btn.addEventListener('click', () => {
