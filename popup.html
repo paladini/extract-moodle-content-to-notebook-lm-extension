@@ -100,10 +100,87 @@
     /* --- Footer --- */
     .footer { display: flex; gap: 6px; }
     .footer .btn { flex: 1; }
+
+    /* --- Inline validation message --- */
+    .validation-msg {
+      font-size: 11px; margin-top: 4px; min-height: 14px;
+      transition: opacity 0.2s;
+    }
+    .validation-msg.error { color: #e94560; }
+    .validation-msg.success { color: #4ecca3; }
+
+    /* --- Hint text --- */
+    .hint-text {
+      font-size: 10px; color: #52525b; text-align: center;
+      margin-bottom: 6px;
+    }
+
+    /* --- Toast notifications --- */
+    .toast-container {
+      position: fixed; top: 8px; left: 16px; right: 16px;
+      z-index: 1000; display: flex; flex-direction: column; gap: 4px;
+    }
+    .toast {
+      padding: 8px 12px; border-radius: 6px;
+      font-size: 11px; font-weight: 500;
+      animation: toast-in 0.25s ease-out;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .toast.success { background: #065f46; color: #a7f3d0; }
+    .toast.error { background: #7f1d1d; color: #fecaca; }
+    .toast.info { background: #1e3a5f; color: #bfdbfe; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
+
+    /* --- Confirmation dialog --- */
+    .confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 2000;
+      align-items: center; justify-content: center;
+    }
+    .confirm-overlay.active { display: flex; }
+    .confirm-box {
+      background: #18181b; border: 1px solid #27272a;
+      border-radius: 8px; padding: 16px; width: 280px;
+      text-align: center;
+    }
+    .confirm-box p { font-size: 12px; margin-bottom: 12px; color: #d4d4d8; }
+    .confirm-box .confirm-actions { display: flex; gap: 8px; justify-content: center; }
+    .confirm-box .confirm-actions button {
+      padding: 7px 16px; border: none; border-radius: 6px;
+      font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+    .confirm-box .btn-confirm-yes { background: #e94560; color: #fff; }
+    .confirm-box .btn-confirm-no { background: #3f3f46; color: #a1a1aa; }
+
+    /* --- Storage warning --- */
+    .storage-warning {
+      display: none; padding: 6px 10px; border-radius: 6px;
+      background: #78350f; color: #fde68a;
+      font-size: 10px; text-align: center; margin-bottom: 10px;
+    }
+    .storage-warning.visible { display: block; }
   </style>
 </head>
 <body>
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Confirmation dialog -->
+  <div id="confirm-overlay" class="confirm-overlay">
+    <div class="confirm-box">
+      <p id="confirm-msg">Are you sure?</p>
+      <div class="confirm-actions">
+        <button id="btn-confirm-yes" class="btn-confirm-yes">Yes, delete</button>
+        <button id="btn-confirm-no" class="btn-confirm-no">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <h1>Moodle Extractor</h1>
+
+  <!-- Storage warning -->
+  <div id="storage-warning" class="storage-warning"></div>
 
   <!-- Moodle URL config -->
   <div class="section">
@@ -112,6 +189,7 @@
       <input id="moodle-url" type="url" placeholder="https://www.moodle.udesc.br">
       <button id="btn-save-url">Save</button>
     </div>
+    <div id="url-validation" class="validation-msg"></div>
   </div>
 
   <!-- Status + capture toggle -->
@@ -119,6 +197,7 @@
     <div><span id="status-dot" class="status-dot idle"></span><span id="status-text">Idle</span></div>
     <span id="status-info" style="color:#71717a; font-size:11px;"></span>
   </div>
+  <div id="capture-hint" class="hint-text"></div>
   <button id="btn-capture" class="btn btn-capture" disabled>Start Capture</button>
 
   <!-- Captured courses -->
