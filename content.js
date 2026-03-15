@@ -402,3 +402,27 @@ chrome.storage.onChanged.addListener((changes, area) => {
     capture();
   }
 });
+
+// SPA navigation detection — capture on URL changes via pushState/popstate
+let _lastUrl = window.location.href;
+
+function checkUrlChanged() {
+  if (window.location.href !== _lastUrl) {
+    _lastUrl = window.location.href;
+    setTimeout(capture, 500);
+  }
+}
+
+window.addEventListener('popstate', checkUrlChanged);
+
+const _origPushState = history.pushState;
+history.pushState = function (...args) {
+  _origPushState.apply(this, args);
+  checkUrlChanged();
+};
+
+const _origReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+  _origReplaceState.apply(this, args);
+  checkUrlChanged();
+};

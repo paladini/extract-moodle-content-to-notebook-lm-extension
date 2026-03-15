@@ -39,6 +39,43 @@ function buildCourseMarkdown(courseName, modules) {
   return lines.join('\n');
 }
 
+/**
+ * Downloads a Markdown string as a .md file using a Blob URL.
+ * Blob URLs have no size limit (unlike data: URLs).
+ * Returns a Promise that resolves on success or rejects on failure.
+ */
+function downloadMarkdown(markdown, filename, saveAs = true) {
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    chrome.downloads.download({ url, filename, saveAs }, (downloadId) => {
+      URL.revokeObjectURL(url);
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError.message);
+      } else {
+        resolve(downloadId);
+      }
+    });
+  });
+}
+
+/**
+ * Updates the extension badge with the total module count.
+ */
+function updateBadgeFromStorage() {
+  chrome.storage.local.get(['isCapturing', 'courses'], (data) => {
+    if (!chrome.action) return;
+    if (data.isCapturing) {
+      const courses = data.courses || {};
+      const total = Object.values(courses).reduce((sum, c) => sum + Object.keys(c.modules).length, 0);
+      chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
+      chrome.action.setBadgeBackgroundColor({ color: '#4ecca3' });
+    } else {
+      chrome.action.setBadgeText({ text: '' });
+    }
+  });
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   // --- Store captured content (course → module) ---
@@ -77,6 +114,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
 
       chrome.storage.local.set({ courses }, () => {
+        updateBadgeFromStorage();
         sendResponse({ success: true });
       });
     });
@@ -85,44 +123,48 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   // --- Export a single course as Markdown ---
   if (message.type === 'exportCourse') {
-    chrome.storage.local.get(['courses'], (data) => {
-      const courses = data.courses || {};
-      const course = courses[message.courseId];
-      if (!course || Object.keys(course.modules).length === 0) {
-        sendResponse({ success: false, error: 'No content captured for this course.' });
-        return;
+    chrome.storage.local.get(['courses'], async (data) => {
+      try {
+        const courses = data.courses || {};
+        const course = courses[message.courseId];
+        if (!course || Object.keys(course.modules).length === 0) {
+          sendResponse({ success: false, error: 'No content captured for this course.' });
+          return;
+        }
+        const markdown = buildCourseMarkdown(course.name, course.modules);
+        const filename = `${slugify(course.name)}.md`;
+        await downloadMarkdown(markdown, filename, true);
+        sendResponse({ success: true });
+      } catch (err) {
+        sendResponse({ success: false, error: String(err) });
       }
-
-      const markdown = buildCourseMarkdown(course.name, course.modules);
-      const filename = `${slugify(course.name)}.md`;
-      const dataUrl = 'data:text/markdown;charset=utf-8,' + encodeURIComponent(markdown);
-
-      chrome.downloads.download({ url: dataUrl, filename, saveAs: true });
-      sendResponse({ success: true });
     });
     return true;
   }
 
   // --- Export all courses (one file each) ---
   if (message.type === 'exportAll') {
-    chrome.storage.local.get(['courses'], (data) => {
-      const courses = data.courses || {};
-      const ids = Object.keys(courses);
-      if (ids.length === 0) {
-        sendResponse({ success: false, error: 'No courses captured.' });
-        return;
+    chrome.storage.local.get(['courses'], async (data) => {
+      try {
+        const courses = data.courses || {};
+        const ids = Object.keys(courses);
+        if (ids.length === 0) {
+          sendResponse({ success: false, error: 'No courses captured.' });
+          return;
+        }
+        let exported = 0;
+        for (const id of ids) {
+          const c = courses[id];
+          if (Object.keys(c.modules).length === 0) continue;
+          const markdown = buildCourseMarkdown(c.name, c.modules);
+          const filename = `${slugify(c.name)}.md`;
+          await downloadMarkdown(markdown, filename, false);
+          exported++;
+        }
+        sendResponse({ success: true, count: exported });
+      } catch (err) {
+        sendResponse({ success: false, error: String(err) });
       }
-
-      ids.forEach((id) => {
-        const c = courses[id];
-        if (Object.keys(c.modules).length === 0) return;
-        const markdown = buildCourseMarkdown(c.name, c.modules);
-        const filename = `${slugify(c.name)}.md`;
-        const dataUrl = 'data:text/markdown;charset=utf-8,' + encodeURIComponent(markdown);
-        chrome.downloads.download({ url: dataUrl, filename, saveAs: false });
-      });
-
-      sendResponse({ success: true, count: ids.length });
     });
     return true;
   }
