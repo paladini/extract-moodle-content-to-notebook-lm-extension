@@ -169,7 +169,7 @@ function cleanLines(parts) {
  * Returns a Markdown string or empty string if no quiz is found.
  */
 function extractQuizContent() {
-  const root = findContentRoot();
+  const root = getCleanRoot();
 
   const parts = [];
 
@@ -211,7 +211,7 @@ function extractQuizContent() {
       const isSelected = input && (
         input.checked
         || input.getAttribute('data-initial-value') === '1'
-        || input.value === '1' && input.hasAttribute('data-initial-value')
+        || (input.value === '1' && input.hasAttribute('data-initial-value'))
       );
       parts.push(isSelected ? `- [x] ${text}` : `- [ ] ${text}`);
     });

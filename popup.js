@@ -13,6 +13,12 @@ const $clearAll = document.getElementById('btn-clear-all');
 
 // ─── Helpers ───
 
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
 function countModules(courses) {
   return Object.values(courses).reduce((sum, c) => sum + Object.keys(c.modules).length, 0);
 }
@@ -44,7 +50,7 @@ function renderCourses(courses) {
     const n = Object.keys(c.modules).length;
     return `
       <div class="course-item">
-        <span class="course-name" title="${c.name}">${c.name}</span>
+        <span class="course-name" title="${escapeHtml(c.name)}">${escapeHtml(c.name)}</span>
         <span class="course-badge">${n} module${n !== 1 ? 's' : ''}</span>
         <div class="course-actions">
           <button class="btn-export-course" data-id="${id}">Export</button>
@@ -67,7 +73,8 @@ function renderCourses(courses) {
     });
   });
 
-  $statusInfo.textContent = `${countModules(courses)} module${countModules(courses) !== 1 ? 's' : ''} total`;
+  const total = countModules(courses);
+  $statusInfo.textContent = `${total} module${total !== 1 ? 's' : ''} total`;
 }
 
 // ─── Refresh full UI from storage ───
