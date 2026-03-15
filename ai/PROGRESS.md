@@ -1,4 +1,4 @@
-## Status: v3.0 — Extração de Questionários + Agrupamento de Lições ✅
+## Status: v4.0 — Quality Audit: Bug Fixes, UX, Content Extraction, Robustness ✅
 
 ### v1.0 — Bootstrap inicial (Tasks 1–5) ✅
 - Implementação inicial da extensão com captura básica e exportação simples.
@@ -73,3 +73,39 @@
 - `cleanLines()`: Pós-processamento — normaliza whitespace, remove linhas curtas, deduplica consecutivas.
 - `extractContent()` usa `getCleanRoot()` e `cleanLines()`.
 - Removido `.activity-description` do seletor de parágrafos (era fonte de "Duração" duplicado).
+
+### v4.0 — Quality Audit: Bug Fixes, UX, Content Extraction, Robustness ✅
+
+**Professional audit covering bugs, missing flows, UX gaps, and content extraction holes.**
+
+#### Phase 1 — Bug Fixes
+- **XSS fix**: `escapeHtml()` in `popup.js` — course names from Moodle are now escaped before `innerHTML`.
+- **Operator precedence fix** (`content.js:214`): Added missing parentheses in quiz answer detection logic.
+- **Unclean root fix**: `extractQuizContent()` now uses `getCleanRoot()` instead of `findContentRoot()` to exclude noise.
+- **Double computation fix**: `countModules()` no longer called twice on the same line.
+
+#### Phase 2 — UX Feedback & Validation (`popup.html` + `popup.js`)
+- **Toast notification system**: Success/error/info toasts for all user actions (save URL, export, clear, capture start/stop).
+- **URL validation**: Enforces protocol (`https://` auto-prepended), validates hostname, shows inline error/success messages.
+- **Enter key support**: Press Enter in URL input to save.
+- **Confirmation dialogs**: "Clear Course" and "Clear All" require user confirmation before deleting data.
+- **Capture hint text**: Shows "Set your Moodle URL above to enable capture" when button is disabled.
+- **Extension badge**: Shows module count on toolbar icon while capturing, clears when stopped.
+- **Storage quota warning**: Shows warning bar when storage usage exceeds 80% of the 10 MB limit.
+
+#### Phase 3 — Content Extraction Improvements (`content.js`)
+- **Tables → Markdown tables**: `<table>` elements extracted with proper `|` column separators and header dividers.
+- **Blockquotes**: `<blockquote>` extracted as Markdown `>` lines.
+- **Code blocks**: `<pre>` and `<code>` extracted as fenced code blocks (` ``` `).
+- **Image alt-text**: `<img>` with meaningful `alt` attributes extracted as `![alt](src)`.
+
+#### Phase 4 — Robustness & Edge Cases
+- **Blob URL exports** (`background.js`): Replaced `data:` URLs with `Blob` URLs — no size limit on export.
+- **Download error handling**: `downloadMarkdown()` returns Promise, catches errors, sends feedback to popup.
+- **Badge updates from background**: `updateBadgeFromStorage()` called on every content capture.
+- **sendResponse guaranteed**: Export handlers wrapped in try/catch ensuring response on all paths.
+- **SPA navigation detection** (`content.js`): Monkey-patches `history.pushState` and `history.replaceState`, listens for `popstate` — captures content on AJAX navigation.
+- **Script injection error handling**: Shows toast when content script can't be injected into current tab.
+
+#### Phase 5 — Polish
+- **Content preview panel** (`popup.html` + `popup.js`): "Preview" button per course toggles expandable panel showing truncated module content before export.
