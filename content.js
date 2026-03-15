@@ -74,13 +74,181 @@ function extractModuleInfo() {
 }
 
 /**
+ * Normalises the current page URL for deduplication purposes.
+ * Moodle lessons (/mod/lesson/) use pageid to navigate sub-pages within the
+ * same activity. Stripping pageid groups all sub-pages under one module key.
+ */
+function normalizeModuleUrl(url) {
+  try {
+    const u = new URL(url);
+    if (u.pathname.includes('/mod/lesson/')) {
+      u.searchParams.delete('pageid');
+    }
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Returns true if the current page is a course overview / section listing page
+ * (e.g. /course/view.php or /course/section.php). These pages just list
+ * activities and don't contain actual lesson content worth capturing.
+ */
+function isCourseOverviewPage() {
+  const path = window.location.pathname;
+  return /\/course\/(view|section)\.php/.test(path);
+}
+
+/**
+ * Selects the best content root element using priority-based lookup.
+ * Prefers [role="main"] (narrowest) over #region-main (includes noise).
+ */
+function findContentRoot() {
+  return document.querySelector('[role="main"]')
+    || document.querySelector('#region-main')
+    || document.querySelector('.course-content')
+    || document.querySelector('#page-content')
+    || document.body;
+}
+
+/**
+ * Noise selectors to strip from the content root before extraction.
+ * These elements contain UI chrome, navigation, metadata, and sidebar
+ * content that pollutes the extracted Markdown.
+ */
+const NOISE_SELECTORS = [
+  '.courseindex',
+  '.drawer',
+  '.activity-header',
+  '.activity-navigation',
+  '.completion-info',
+  '.activity-information',
+  '#page-navbar',
+  '.breadcrumb',
+  '.navbar',
+  '.footer',
+  '#page-footer',
+  '.popover-region',
+  '.usermenu',
+  '.logininfo',
+  '.learningtools-action-info',
+  '[data-region="drawer"]',
+  '[data-region="fixed-drawer"]',
+  '.tertiary-navigation',
+  '.lessonbutton',
+].join(', ');
+
+/**
+ * Clones the content root and removes noise elements so that only
+ * meaningful content is left for text extraction.
+ */
+function getCleanRoot() {
+  const root = findContentRoot();
+  const clone = root.cloneNode(true);
+  clone.querySelectorAll(NOISE_SELECTORS).forEach((el) => el.remove());
+  return clone;
+}
+
+/**
+ * Post-processes extracted text lines: trims whitespace, removes
+ * near-empty lines, deduplicates consecutive identical lines,
+ * and collapses excessive blank lines.
+ */
+function cleanLines(parts) {
+  return parts
+    .map((line) => line.replace(/\s+/g, ' ').trim())
+    .filter((line) => line.length > 3)
+    .filter((line, i, arr) => i === 0 || line !== arr[i - 1]);
+}
+
+/**
+ * Extracts quiz/questionnaire content from Moodle lesson question pages.
+ * Detects multichoice forms, extracts the question text, answer options,
+ * and marks which answers the user selected.
+ * Returns a Markdown string or empty string if no quiz is found.
+ */
+function extractQuizContent() {
+  const root = findContentRoot();
+
+  const parts = [];
+
+  // --- Lesson question pages (multichoice) ---
+  const answerOptions = root.querySelectorAll('.answeroption');
+  if (answerOptions.length > 0) {
+    const questionContainer = root.querySelector('#id_pageheadercontainer .contents .no-overflow, #id_pageheadercontainer .contents');
+    if (questionContainer) {
+      const questionText = questionContainer.textContent.trim();
+      if (questionText) {
+        parts.push('### Questão');
+        parts.push(questionText);
+      }
+    }
+
+    const isMultiAnswer = !!root.querySelector(
+      'input[name*="_qf__lesson_display_answer_form_multichoice_multianswer"]'
+    );
+    const isSingleAnswer = !isMultiAnswer && !!root.querySelector(
+      'input[name*="_qf__lesson_display_answer_form_multichoice_singleanswer"], .answeroption input[type="radio"]'
+    );
+
+    if (isMultiAnswer) {
+      parts.push('**Tipo:** Múltipla escolha (múltiplas respostas)');
+    } else if (isSingleAnswer) {
+      parts.push('**Tipo:** Múltipla escolha (resposta única)');
+    } else {
+      parts.push('**Tipo:** Questão');
+    }
+
+    parts.push('');
+    answerOptions.forEach((opt) => {
+      const input = opt.querySelector('input[type="checkbox"], input[type="radio"]');
+      const label = opt.querySelector('label');
+      if (!label) return;
+      const text = label.textContent.trim();
+      if (!text) return;
+
+      const isSelected = input && (
+        input.checked
+        || input.getAttribute('data-initial-value') === '1'
+        || input.value === '1' && input.hasAttribute('data-initial-value')
+      );
+      parts.push(isSelected ? `- [x] ${text}` : `- [ ] ${text}`);
+    });
+  }
+
+  // --- Lesson end-of-lesson page (score) ---
+  const endHeading = root.querySelector('h2');
+  if (endHeading && /fim desta li[çc][ãa]o|end of lesson/i.test(endHeading.textContent)) {
+    const scoreBox = root.querySelector('.generalbox .center, .generalbox .box');
+    if (scoreBox) {
+      const scoreText = scoreBox.textContent.trim();
+      if (scoreText) {
+        parts.push('### Resultado da Lição');
+        parts.push(scoreText);
+      }
+    }
+  }
+
+  // --- Lesson feedback/response pages ---
+  const responseEl = root.querySelector('.response, .feedback, .correctanswer');
+  if (responseEl) {
+    const responseText = responseEl.textContent.trim();
+    if (responseText) {
+      parts.push('### Feedback');
+      parts.push(responseText);
+    }
+  }
+
+  return parts.join('\n');
+}
+
+/**
  * Extracts the main text content from the Moodle page.
  * Keeps extraction generic to work across themes and content types.
  */
 function extractContent() {
-  const root = document.querySelector(
-    '[role="main"], #region-main, .course-content, #page-content'
-  ) || document.body;
+  const root = getCleanRoot();
 
   const parts = [];
 
@@ -90,7 +258,7 @@ function extractContent() {
     if (text) parts.push(`${'#'.repeat(level)} ${text}`);
   });
 
-  root.querySelectorAll('p, .no-overflow, .text_to_html, .activity-description, .contentwithoutlink').forEach((el) => {
+  root.querySelectorAll('p, .no-overflow, .text_to_html, .contentwithoutlink').forEach((el) => {
     const text = el.textContent.trim();
     if (text && text.length > 5) parts.push(text);
   });
@@ -128,8 +296,7 @@ function extractContent() {
     resources.forEach((r) => parts.push(`- [${r.text}](${r.href})`));
   }
 
-  const deduped = parts.filter((line, i) => i === 0 || line !== parts[i - 1]);
-  return deduped.join('\n\n');
+  return cleanLines(parts).join('\n\n');
 }
 
 /**
@@ -146,9 +313,16 @@ function capture() {
     const baseUrl = data.moodleBaseUrl.replace(/\/+$/, '');
     if (!window.location.href.startsWith(baseUrl)) return;
 
+    // Skip course overview/section pages — they list activities, not content
+    if (isCourseOverviewPage()) return;
+
     const { courseName, courseId } = extractCourseInfo();
     const { moduleName, moduleType } = extractModuleInfo();
-    const content = extractContent();
+    const genericContent = extractContent();
+    const quizContent = extractQuizContent();
+
+    const contentParts = [genericContent, quizContent].filter(Boolean);
+    const content = contentParts.join('\n\n');
 
     if (!content || content.length < 20) return;
 
@@ -159,6 +333,7 @@ function capture() {
       moduleType,
       content,
       url: window.location.href,
+      normalizedUrl: normalizeModuleUrl(window.location.href),
       capturedAt: new Date().toISOString(),
     };
 
@@ -175,5 +350,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     capture();
     sendResponse({ success: true });
     return true;
+  }
+});
+
+// React to capture being enabled — no message needed
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.isCapturing && changes.isCapturing.newValue === true) {
+    capture();
   }
 });

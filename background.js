@@ -41,34 +41,10 @@ function buildCourseMarkdown(courseName, modules) {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
-  // --- Toggle capture state ---
-  if (message.type === 'toggleCapture') {
-    const isCapturing = message.isCapturing;
-    chrome.storage.local.set({ isCapturing }, () => {
-      if (isCapturing) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs[0]) {
-            chrome.tabs.sendMessage(tabs[0].id, { type: 'startCapture' });
-          }
-        });
-      }
-      sendResponse({ success: true, isCapturing });
-    });
-    return true;
-  }
-
-  // --- Save Moodle base URL ---
-  if (message.type === 'setMoodleBaseUrl') {
-    const url = (message.url || '').replace(/\/+$/, '');
-    chrome.storage.local.set({ moodleBaseUrl: url }, () => {
-      sendResponse({ success: true });
-    });
-    return true;
-  }
-
   // --- Store captured content (course → module) ---
   if (message.type === 'contentCaptured') {
     const p = message.payload;
+    const moduleKey = p.normalizedUrl || p.url;
     chrome.storage.local.get(['courses'], (data) => {
       const courses = data.courses || {};
 
@@ -76,18 +52,29 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         courses[p.courseId] = { name: p.courseName, modules: {} };
       }
 
-      // Deduplicate by URL
-      if (courses[p.courseId].modules[p.url]) {
+      const existing = courses[p.courseId].modules[moduleKey];
+
+      // Deduplicate by exact URL within the same module key
+      if (existing && existing._capturedUrls && existing._capturedUrls.includes(p.url)) {
         sendResponse({ success: true, skipped: true });
         return;
       }
 
-      courses[p.courseId].modules[p.url] = {
-        moduleName: p.moduleName,
-        moduleType: p.moduleType,
-        content: p.content,
-        capturedAt: p.capturedAt,
-      };
+      if (existing) {
+        // Append new sub-page content to existing module
+        existing.content += '\n\n---\n\n' + p.content;
+        existing.capturedAt = p.capturedAt;
+        if (!existing._capturedUrls) existing._capturedUrls = [];
+        existing._capturedUrls.push(p.url);
+      } else {
+        courses[p.courseId].modules[moduleKey] = {
+          moduleName: p.moduleName,
+          moduleType: p.moduleType,
+          content: p.content,
+          capturedAt: p.capturedAt,
+          _capturedUrls: [p.url],
+        };
+      }
 
       chrome.storage.local.set({ courses }, () => {
         sendResponse({ success: true });
@@ -161,13 +148,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
-// Initialise default state on install
+// Initialise default state on install — merge, never overwrite existing data
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.get(['moodleBaseUrl'], (data) => {
-    chrome.storage.local.set({
-      isCapturing: false,
-      courses: {},
-      moodleBaseUrl: data.moodleBaseUrl || '',
-    });
+  chrome.storage.local.get(['moodleBaseUrl', 'courses', 'isCapturing'], (data) => {
+    const defaults = {};
+    if (data.moodleBaseUrl === undefined) defaults.moodleBaseUrl = '';
+    if (data.courses === undefined) defaults.courses = {};
+    if (data.isCapturing === undefined) defaults.isCapturing = false;
+    if (Object.keys(defaults).length > 0) {
+      chrome.storage.local.set(defaults);
+    }
   });
 });

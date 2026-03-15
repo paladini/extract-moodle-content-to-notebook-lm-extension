@@ -84,18 +84,32 @@ function refreshUI() {
 // ─── Event listeners ───
 
 $saveUrl.addEventListener('click', () => {
-  const url = $url.value.trim();
+  const url = $url.value.trim().replace(/\/+$/, '');
   if (!url) return;
-  chrome.runtime.sendMessage({ type: 'setMoodleBaseUrl', url }, () => {
-    $capture.disabled = false;
+  chrome.storage.local.set({ moodleBaseUrl: url }, () => {
+    refreshUI();
   });
 });
 
 $capture.addEventListener('click', () => {
   chrome.storage.local.get(['isCapturing'], (data) => {
     const newState = !data.isCapturing;
-    chrome.runtime.sendMessage({ type: 'toggleCapture', isCapturing: newState }, () => {
+    chrome.storage.local.set({ isCapturing: newState }, () => {
       setCaptureUI(newState);
+      if (newState) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs[0]?.id) {
+            const tabId = tabs[0].id;
+            chrome.tabs.sendMessage(tabId, { type: 'startCapture' }).catch(() => {
+              // Content script not injected yet — inject and run capture
+              chrome.scripting.executeScript({
+                target: { tabId },
+                files: ['content.js'],
+              }).catch(() => {});
+            });
+          }
+        });
+      }
     });
   });
 });
