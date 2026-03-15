@@ -271,6 +271,49 @@ function extractContent() {
     });
   });
 
+  // Tables → Markdown tables
+  root.querySelectorAll('table').forEach((table) => {
+    const rows = table.querySelectorAll('tr');
+    if (rows.length === 0) return;
+    const mdRows = [];
+    rows.forEach((tr, ri) => {
+      const cells = tr.querySelectorAll('th, td');
+      const cellTexts = Array.from(cells).map((c) => c.textContent.trim().replace(/\|/g, '\\|').replace(/\n/g, ' '));
+      if (cellTexts.length === 0) return;
+      mdRows.push('| ' + cellTexts.join(' | ') + ' |');
+      if (ri === 0) {
+        mdRows.push('| ' + cellTexts.map(() => '---').join(' | ') + ' |');
+      }
+    });
+    if (mdRows.length > 1) parts.push(mdRows.join('\n'));
+  });
+
+  // Blockquotes
+  root.querySelectorAll('blockquote').forEach((bq) => {
+    const text = bq.textContent.trim();
+    if (text && text.length > 5) {
+      parts.push(text.split('\n').map((line) => `> ${line.trim()}`).join('\n'));
+    }
+  });
+
+  // Code blocks
+  root.querySelectorAll('pre, code').forEach((el) => {
+    if (el.tagName === 'CODE' && el.parentElement?.tagName === 'PRE') return;
+    const text = el.textContent.trim();
+    if (text && text.length > 3) {
+      parts.push('```\n' + text + '\n```');
+    }
+  });
+
+  // Images with meaningful alt text
+  root.querySelectorAll('img[alt]').forEach((img) => {
+    const alt = img.getAttribute('alt')?.trim();
+    const src = img.getAttribute('src') || '';
+    if (alt && alt.length > 3 && !/^spacer$|^pixel$/i.test(alt)) {
+      parts.push(`![${alt}](${src})`);
+    }
+  });
+
   const videos = [];
   root.querySelectorAll('iframe[src], video source[src], a[href]').forEach((el) => {
     const src = el.getAttribute('src') || el.getAttribute('href') || '';
