@@ -1,36 +1,64 @@
 # Contributing
 
-Thanks for considering contributing to the Moodle Content Extractor! Here's how to get started.
+Thanks for contributing.
 
-## Getting started
+This project is intentionally small, dependency-free, and easy to run locally. Contributions should preserve that simplicity.
+
+## Local setup
 
 1. Fork and clone the repository.
-2. Open `chrome://extensions`, enable Developer mode, and load the project folder as an unpacked extension.
-3. Make your changes — the extension uses vanilla JS with no build step.
-4. Reload the extension in `chrome://extensions` to test.
+2. Open `chrome://extensions`.
+3. Enable Developer mode.
+4. Load the project folder as an unpacked extension.
+5. Reload the extension after each change while testing.
 
-## Guidelines
+## Project principles
 
-- **Keep it generic.** Moodle installations vary widely in themes, versions, and configurations. Avoid overly specific CSS selectors or assumptions about DOM structure. Prefer broad, resilient selectors.
-- **No build tools required.** The extension should remain zero-dependency and work by loading the folder directly.
-- **Test on real Moodle pages.** If possible, verify your changes against a live Moodle instance.
-- **Follow existing code style.** Consistent formatting, JSDoc comments on public functions, and clear variable names.
+- Keep the extension zero-dependency when possible.
+- Prefer resilient Moodle selectors over brittle theme-specific selectors.
+- Preserve local-first behavior and avoid unnecessary network dependencies.
+- Keep the UX direct and understandable.
+- Avoid large refactors unless they clearly reduce complexity or risk.
 
-## Reporting issues
+## What makes a good contribution
 
-Open an issue with:
-- Your Moodle version/theme (if known).
+- Fixes a real bug with a narrow, understandable diff.
+- Improves content extraction across Moodle variants.
+- Improves export quality for NotebookLM workflows.
+- Improves reliability, backup, recovery, or error handling.
+- Improves docs for users and contributors.
+
+## Testing expectations
+
+Before opening a pull request, try to validate the change on a real Moodle page when possible.
+
+Useful manual checks:
+
+1. Start capture and browse a Moodle course.
+2. Confirm the course and modules appear correctly in the popup.
+3. Export Markdown and inspect the output structure.
+4. If your change touches persistence, test backup, restore, and clear flows.
+5. If your change touches NotebookLM guidance, verify the README instructions remain accurate.
+
+## Pull request guidelines
+
+1. Create a focused branch from `main`.
+2. Keep commits small and descriptive.
+3. Update docs when behavior changes.
+4. Explain the problem, the change, and the tradeoff in the PR description.
+5. Include screenshots or sample output when the UI or exported content changes.
+
+## Issue reports
+
+Please include:
+
+- Browser name and version.
+- Moodle version or theme, if known.
 - Steps to reproduce.
-- Expected vs actual behavior.
-- Browser and OS.
+- Expected behavior.
+- Actual behavior.
+- Screenshots or exported snippets if useful.
 
-## Pull requests
+## Community standards
 
-1. Create a feature branch from `main`.
-2. Keep commits focused and descriptive.
-3. Update the README if your change affects usage.
-4. Open a PR with a clear description of what and why.
-
-## Code of conduct
-
-Be respectful and constructive. We're all here to make studying easier.
+Be respectful, specific, and constructive. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
