@@ -25,6 +25,19 @@ Prepare these assets in advance:
 - Privacy disclosure and support links.
 - Website URL or GitHub URL.
 
+What the repository already has:
+
+- Basic extension icons in `icons/icon-16.png`, `icons/icon-48.png`, and `icons/icon-128.png`.
+- Privacy page in `docs/privacy.html`.
+- Permissions explanation page in `docs/permissions.html`.
+- Public landing page in `docs/index.html`.
+
+What you still need for the Chrome Web Store listing:
+
+- Store screenshots.
+- Optional promotional graphics if you want a richer listing.
+- Final store description text.
+
 ## 4. Upload the package
 
 1. Create a new item in the dashboard.
@@ -41,6 +54,12 @@ You will likely need to declare:
 - Why permissions such as `storage`, `downloads`, `activeTab`, and `scripting` are needed.
 
 Because this extension is local-first, be explicit that it stores content locally in the browser and exports files on user request.
+
+Suggested public links for the listing:
+
+- Website: `https://paladini.github.io/extract-moodle-content-to-notebook-lm-extension/`
+- Privacy policy: `https://paladini.github.io/extract-moodle-content-to-notebook-lm-extension/privacy.html`
+- Permissions explanation: `https://paladini.github.io/extract-moodle-content-to-notebook-lm-extension/permissions.html`
 
 ## 6. Submit for review
 
