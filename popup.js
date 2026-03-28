@@ -12,6 +12,10 @@ const $statusInfo = document.getElementById('status-info');
 const $courseList = document.getElementById('course-list');
 const $exportAll = document.getElementById('btn-export-all');
 const $clearAll = document.getElementById('btn-clear-all');
+const $exportBackup = document.getElementById('btn-export-backup');
+const $importBackup = document.getElementById('btn-import-backup');
+const $restoreLast = document.getElementById('btn-restore-last');
+const $backupFileInput = document.getElementById('backup-file-input');
 const $toastContainer = document.getElementById('toast-container');
 const $confirmOverlay = document.getElementById('confirm-overlay');
 const $confirmMsg = document.getElementById('confirm-msg');
@@ -29,6 +33,15 @@ function escapeHtml(str) {
 
 function countModules(courses) {
   return Object.values(courses).reduce((sum, c) => sum + Object.keys(c.modules).length, 0);
+}
+
+function getModulePreviewContent(mod) {
+  if (mod.subPages && typeof mod.subPages === 'object') {
+    return Object.values(mod.subPages)
+      .sort((a, b) => (a.order || 0) - (b.order || 0))
+      .map((p) => p.content).filter(Boolean).join('\n\n---\n\n');
+  }
+  return mod.content || '';
 }
 
 // ─── Toast notifications ───
@@ -154,10 +167,11 @@ function renderCourses(courses) {
     const n = Object.keys(c.modules).length;
     const moduleEntries = Object.values(c.modules);
     const previewHtml = moduleEntries.map((mod) => {
-      const snippet = escapeHtml((mod.content || '').substring(0, 200));
+      const fullContent = getModulePreviewContent(mod);
+      const snippet = escapeHtml(fullContent.substring(0, 200));
       return `<div class="preview-module">
         <div class="preview-module-name">${escapeHtml(mod.moduleName)}</div>
-        <div class="preview-module-content">${snippet}${mod.content.length > 200 ? '...' : ''}</div>
+        <div class="preview-module-content">${snippet}${fullContent.length > 200 ? '...' : ''}</div>
       </div>`;
     }).join('');
     return `
@@ -197,11 +211,15 @@ function renderCourses(courses) {
   $courseList.querySelectorAll('.btn-clear-course').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const name = btn.dataset.name || 'this course';
-      const ok = await showConfirm(`Delete all captured data for "${name}"?`);
+      const ok = await showConfirm(`Delete all captured data for "${name}"? A safety snapshot will be created first.`);
       if (!ok) return;
-      chrome.runtime.sendMessage({ type: 'clearCourse', courseId: btn.dataset.id }, () => {
-        showToast('Course cleared.', 'info');
-        refreshUI();
+      chrome.runtime.sendMessage({ type: 'clearCourse', courseId: btn.dataset.id }, (resp) => {
+        if (resp && resp.success) {
+          showToast('Course cleared.', 'info');
+          refreshUI();
+        } else {
+          showToast(resp?.error || 'Clear failed.', 'error');
+        }
       });
     });
   });
@@ -220,6 +238,11 @@ function refreshUI() {
     renderCourses(data.courses || {});
     updateBadge(!!data.isCapturing, data.courses || {});
     checkStorageQuota();
+
+    chrome.runtime.sendMessage({ type: 'getSnapshotStatus' }, (resp) => {
+      if (!resp || !resp.success || !resp.count) return;
+      $statusInfo.textContent += ` | snapshots: ${resp.count}`;
+    });
   });
 }
 
@@ -283,11 +306,64 @@ $exportAll.addEventListener('click', () => {
 });
 
 $clearAll.addEventListener('click', async () => {
-  const ok = await showConfirm('Delete ALL captured courses? This cannot be undone.');
+  const ok = await showConfirm('Delete ALL captured courses? A safety snapshot will be created first.');
   if (!ok) return;
-  chrome.runtime.sendMessage({ type: 'clearAll' }, () => {
-    showToast('All data cleared.', 'info');
-    refreshUI();
+  chrome.runtime.sendMessage({ type: 'clearAll' }, (resp) => {
+    if (resp && resp.success) {
+      showToast('All data cleared.', 'info');
+      refreshUI();
+    } else {
+      showToast(resp?.error || 'Clear failed.', 'error');
+    }
+  });
+});
+
+$exportBackup.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ type: 'exportBackup' }, (resp) => {
+    if (resp && resp.success) {
+      showToast('Backup JSON exported.', 'success');
+    } else {
+      showToast(resp?.error || 'Backup export failed.', 'error');
+    }
+  });
+});
+
+$importBackup.addEventListener('click', () => {
+  $backupFileInput.click();
+});
+
+$backupFileInput.addEventListener('change', () => {
+  const file = $backupFileInput.files && $backupFileInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const text = typeof reader.result === 'string' ? reader.result : '';
+    chrome.runtime.sendMessage({ type: 'importBackup', backupJson: text }, (resp) => {
+      if (resp && resp.success) {
+        showToast('Backup restored successfully.', 'success');
+        refreshUI();
+      } else {
+        showToast(resp?.error || 'Backup restore failed.', 'error');
+      }
+      $backupFileInput.value = '';
+    });
+  };
+  reader.onerror = () => {
+    showToast('Could not read backup file.', 'error');
+    $backupFileInput.value = '';
+  };
+  reader.readAsText(file);
+});
+
+$restoreLast.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ type: 'restoreLastSnapshot' }, (resp) => {
+    if (resp && resp.success) {
+      showToast(`Recovered ${resp.courseCount} course(s) from snapshot.`, 'success');
+      refreshUI();
+    } else {
+      showToast(resp?.error || 'Snapshot restore failed.', 'error');
+    }
   });
 });
 

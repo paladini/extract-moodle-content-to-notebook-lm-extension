@@ -242,6 +242,14 @@
     <button id="btn-clear-all" class="btn btn-secondary" disabled>Clear All</button>
   </div>
 
+  <div class="footer">
+    <button id="btn-export-backup" class="btn btn-secondary">Backup JSON</button>
+    <button id="btn-restore-last" class="btn btn-secondary">Restore Last</button>
+  </div>
+
+  <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none;">
+  <button id="btn-import-backup" class="btn btn-secondary">Import Backup JSON</button>
+
   <script src="popup.js"></script>
 </body>
 </html>

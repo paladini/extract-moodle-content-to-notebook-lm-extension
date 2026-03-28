@@ -83,6 +83,9 @@ function normalizeModuleUrl(url) {
     const u = new URL(url);
     if (u.pathname.includes('/mod/lesson/')) {
       u.searchParams.delete('pageid');
+      // Normalize continue.php (answer/feedback page) to view.php
+      // so responses are grouped with their lesson module
+      u.pathname = u.pathname.replace(/\/continue\.php$/, '/view.php');
     }
     return u.toString();
   } catch {
@@ -230,13 +233,45 @@ function extractQuizContent() {
     }
   }
 
-  // --- Lesson feedback/response pages ---
-  const responseEl = root.querySelector('.response, .feedback, .correctanswer');
-  if (responseEl) {
-    const responseText = responseEl.textContent.trim();
-    if (responseText) {
-      parts.push('### Feedback');
-      parts.push(responseText);
+  // --- Lesson answer/feedback pages (after submitting an answer) ---
+  const correctAnswerBox = root.querySelector('.correctanswer.generalbox');
+  if (correctAnswerBox) {
+    // Question text lives in a sibling .generalbox before .correctanswer
+    const questionBox = root.querySelector('.generalbox:not(.correctanswer) .no-overflow');
+    if (questionBox) {
+      const questionText = questionBox.textContent.trim();
+      if (questionText) {
+        parts.push('### Questão');
+        parts.push(questionText);
+      }
+    }
+
+    // Student's selected answer
+    const answerEl = correctAnswerBox.querySelector('.studentanswer .no-overflow .text_to_html, .studentanswer .no-overflow');
+    if (answerEl) {
+      const answerText = answerEl.textContent.trim();
+      if (answerText) {
+        parts.push('**Resposta:** ' + answerText);
+      }
+    }
+
+    // Feedback / result
+    const responseEl = correctAnswerBox.querySelector('.response');
+    if (responseEl) {
+      const feedbackText = responseEl.textContent.replace(/^Retorno\s*:\s*/i, '').trim();
+      if (feedbackText) {
+        parts.push('**Retorno:** ' + feedbackText);
+      }
+    }
+  } else {
+    // Fallback: generic feedback elements outside .correctanswer
+    const responseEl = root.querySelector('.response, .feedback');
+    if (responseEl) {
+      const responseText = responseEl.textContent.trim();
+      if (responseText) {
+        parts.push('### Feedback');
+        parts.push(responseText);
+      }
     }
   }
 
@@ -360,6 +395,9 @@ function capture() {
     if (isCourseOverviewPage()) return;
 
     const { courseName, courseId } = extractCourseInfo();
+    // Skip pages where we can't identify the course (dashboard, profile, etc.)
+    if (courseId === 'unknown') return;
+
     const { moduleName, moduleType } = extractModuleInfo();
     const genericContent = extractContent();
     const quizContent = extractQuizContent();
@@ -369,12 +407,22 @@ function capture() {
 
     if (!content || content.length < 20) return;
 
+    // For lesson sub-pages, extract pageid so background can store per-sub-page
+    let pageId = null;
+    try {
+      const params = new URL(window.location.href).searchParams;
+      if (window.location.pathname.includes('/mod/lesson/')) {
+        pageId = params.get('pageid') || '_entry';
+      }
+    } catch { /* ignore */ }
+
     const payload = {
       courseName,
       courseId,
       moduleName,
       moduleType,
       content,
+      pageId,
       url: window.location.href,
       normalizedUrl: normalizeModuleUrl(window.location.href),
       capturedAt: new Date().toISOString(),
@@ -396,7 +444,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
-// React to capture being enabled — no message needed
+// React to capture being enabled — attempt capture on all Moodle tabs immediately.
+// Safe because capture() skips pages where courseId is 'unknown'.
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.isCapturing && changes.isCapturing.newValue === true) {
     capture();
