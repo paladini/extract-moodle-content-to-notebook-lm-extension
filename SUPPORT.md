@@ -4,7 +4,7 @@
 
 - Use GitHub Issues for bugs and feature requests.
 - Use Discussions, if enabled later, for general questions and ideas.
-- Use private contact for security-sensitive issues.
+- Use private contact with Fernando Paladini at fnpaladini@gmail.com for security-sensitive issues.
 
 ## Before opening an issue
 

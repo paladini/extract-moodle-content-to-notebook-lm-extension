@@ -34,11 +34,12 @@ Before opening a pull request, try to validate the change on a real Moodle page 
 
 Useful manual checks:
 
-1. Start capture and browse a Moodle course.
-2. Confirm the course and modules appear correctly in the popup.
-3. Export Markdown and inspect the output structure.
-4. If your change touches persistence, test backup, restore, and clear flows.
-5. If your change touches NotebookLM guidance, verify the README instructions remain accurate.
+1. Open a Moodle lesson, page, or activity.
+2. Click Capture Current Page in the popup.
+3. Repeat on a few pages and confirm the course and modules appear correctly in the popup.
+4. Export Markdown and inspect the output structure.
+5. If your change touches persistence, test backup, restore, and clear flows.
+6. If your change touches NotebookLM guidance, verify the README instructions remain accurate.
 
 ## Pull request guidelines
 

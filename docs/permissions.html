@@ -43,18 +43,19 @@
         <h2><code>storage</code></h2>
         <p>
           Used to store captured course content, user settings, backup metadata,
-          recovery snapshots, and capture state locally inside the browser.
+          and recovery snapshots locally inside the browser.
         </p>
 
         <h2><code>activeTab</code></h2>
         <p>
-          Used to interact with the current tab when the user actively uses the extension.
-          This helps the extension work with the page the user is viewing without requiring broader permanent host access in the popup flow.
+          Used to interact with the current tab when the user clicks the extension on a Moodle page.
+          This keeps access limited to the page the user is actively viewing instead of requiring broad permanent host access.
         </p>
 
         <h2><code>scripting</code></h2>
         <p>
-          Used to coordinate extension logic on the current page and support content extraction workflows in Chromium environments that rely on extension scripting APIs.
+          Used to inject the extraction logic into the current tab only when the user requests a capture.
+          This lets the extension read the visible Moodle content and save it locally without automatic page-wide injection.
         </p>
 
         <h2><code>downloads</code></h2>
@@ -64,8 +65,8 @@
 
         <h2>Why the extension injects on pages</h2>
         <p>
-          The content script runs on pages in order to detect Moodle pages and extract content only when the page matches the expected Moodle structure.
-          The user controls when capture is active.
+          The extension injects only on the current page after a user action in the popup.
+          It then checks whether the page matches Moodle structure and extracts content only from that page.
         </p>
 
         <h2>Data handling summary</h2>
@@ -75,6 +76,12 @@
           <li>Data is not transferred to a remote backend by default.</li>
           <li>Files are only downloaded when the user explicitly requests export.</li>
         </ul>
+
+        <h2>Maintainer</h2>
+        <p>
+          Fernando Paladini, GitHub <a href="https://github.com/paladini">@paladini</a>,
+          <a href="mailto:fnpaladini@gmail.com">fnpaladini@gmail.com</a>.
+        </p>
       </div>
     </div>
   </body>

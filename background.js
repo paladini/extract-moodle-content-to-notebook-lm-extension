@@ -234,15 +234,13 @@ function getModuleCapturedAt(mod) {
  * Updates the extension badge with the total module count.
  */
 function updateBadgeFromStorage() {
-  chrome.storage.local.get(['isCapturing', 'courses'], (data) => {
+  chrome.storage.local.get(['courses'], (data) => {
     if (!chrome.action) return;
-    if (data.isCapturing) {
-      const courses = data.courses || {};
-      const total = Object.values(courses).reduce((sum, c) => sum + Object.keys(c.modules).length, 0);
-      chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
+    const courses = data.courses || {};
+    const total = Object.values(courses).reduce((sum, c) => sum + Object.keys(c.modules).length, 0);
+    chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
+    if (total > 0) {
       chrome.action.setBadgeBackgroundColor({ color: '#4ecca3' });
-    } else {
-      chrome.action.setBadgeText({ text: '' });
     }
   });
 }
@@ -403,7 +401,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         const data = await storageGet(['courses']);
         const courses = data.courses || {};
         await createSnapshot('before-clear-all', courses);
-        await storageSet({ courses: {}, isCapturing: false });
+        await storageSet({ courses: {} });
         updateBadgeFromStorage();
         sendResponse({ success: true });
       } catch (err) {
@@ -417,12 +415,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'exportBackup') {
     (async () => {
       try {
-        const data = await storageGet(['courses', 'moodleBaseUrl', 'isCapturing', SNAPSHOT_KEY]);
+        const data = await storageGet(['courses', 'moodleBaseUrl', SNAPSHOT_KEY]);
         const payload = {
           version: 1,
           exportedAt: new Date().toISOString(),
           moodleBaseUrl: data.moodleBaseUrl || '',
-          isCapturing: !!data.isCapturing,
           courses: data.courses || {},
           snapshots: Array.isArray(data[SNAPSHOT_KEY]) ? data[SNAPSHOT_KEY] : [],
         };
@@ -456,7 +453,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         await setCoursesWithVerification(parsed.courses || {});
         await storageSet({
           moodleBaseUrl: parsed.moodleBaseUrl || '',
-          isCapturing: !!parsed.isCapturing,
         });
         updateBadgeFromStorage();
         sendResponse({ success: true });
@@ -502,13 +498,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 // Initialise default state on install — merge, never overwrite existing data
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.get(['moodleBaseUrl', 'courses', 'isCapturing'], (data) => {
+  chrome.storage.local.get(['moodleBaseUrl', 'courses'], (data) => {
     const defaults = {};
     if (data.moodleBaseUrl === undefined) defaults.moodleBaseUrl = '';
     if (data.courses === undefined) defaults.courses = {};
-    if (data.isCapturing === undefined) defaults.isCapturing = false;
     if (Object.keys(defaults).length > 0) {
       chrome.storage.local.set(defaults);
     }
+    chrome.storage.local.remove('isCapturing');
   });
 });

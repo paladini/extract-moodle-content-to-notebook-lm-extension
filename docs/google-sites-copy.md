@@ -6,7 +6,7 @@ Turn Moodle into NotebookLM-ready study material
 
 ## Hero subtitle
 
-Capture Moodle course pages as you browse and export each course as clean Markdown for NotebookLM, summaries, flashcards, and revision workflows.
+Capture individual Moodle lesson and activity pages and export each course as clean Markdown for NotebookLM, summaries, flashcards, and revision workflows.
 
 ## Primary call to action
 
@@ -18,11 +18,12 @@ View the source on GitHub
 
 ## Section: How it works
 
-1. Start capture in the extension.
-2. Browse your Moodle course normally.
-3. Export the course as Markdown.
-4. Upload the Markdown and your course syllabus to NotebookLM.
-5. Ask Gemini to generate flashcards, summaries, or study guides.
+1. Open a Moodle lesson or activity page.
+2. Capture the current page in the extension.
+3. Repeat on the pages you want to save.
+4. Export the course as Markdown.
+5. Upload the Markdown and your course syllabus to NotebookLM.
+6. Ask Gemini to generate flashcards, summaries, or study guides.
 
 ## Section: Why people use it
 
@@ -40,4 +41,4 @@ View the source on GitHub
 
 ## Footer
 
-Open-source Chrome extension by Fernando Paladini.
+Open-source Chrome extension by Fernando Paladini, GitHub @paladini, contact: fnpaladini@gmail.com.

@@ -39,15 +39,15 @@ cd extract-moodle-content-to-notebook-lm-extension
 
 1. Abra o popup da extensão.
 2. Informe a URL base do seu Moodle.
-3. Clique em Start Capture.
-4. Navegue normalmente pelas páginas da disciplina.
-5. Clique em Stop Capture quando terminar.
+3. Abra a página do Moodle que você quer salvar.
+4. Clique em Capture Current Page.
+5. Repita o processo em cada lição ou atividade que quiser incluir.
 6. Exporte um curso específico ou todos os cursos.
 7. Faça upload do Markdown no NotebookLM junto com o plano de ensino.
 
 ## Recursos principais
 
-- Captura automática em segundo plano.
+- Captura manual da página atual.
 - Organização por curso e módulo.
 - Exportação em Markdown por curso.
 - Captura de vídeos e links de arquivos.
@@ -65,6 +65,13 @@ cd extract-moodle-content-to-notebook-lm-extension
 ## Contribuição
 
 Leia [CONTRIBUTING.pt-BR.md](CONTRIBUTING.pt-BR.md) ou [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Autor
+
+Fernando Paladini
+
+- GitHub: https://github.com/paladini
+- E-mail: fnpaladini@gmail.com
 
 ## Licença
 

@@ -381,22 +381,35 @@ function extractContent() {
  * Main capture routine. Validates context, extracts structured data,
  * and sends it to the background service worker for storage.
  */
-function capture() {
-  if (!isMoodlePage()) return;
+function captureCurrentPage(callback = () => {}) {
+  if (!isMoodlePage()) {
+    callback({ success: false, error: 'This page does not look like a Moodle content page.' });
+    return;
+  }
 
-  chrome.storage.local.get(['moodleBaseUrl', 'isCapturing'], (data) => {
-    if (!data.isCapturing) return;
-    if (!data.moodleBaseUrl) return;
+  chrome.storage.local.get(['moodleBaseUrl'], (data) => {
+    if (!data.moodleBaseUrl) {
+      callback({ success: false, error: 'Save your Moodle base URL before capturing.' });
+      return;
+    }
 
     const baseUrl = data.moodleBaseUrl.replace(/\/+$/, '');
-    if (!window.location.href.startsWith(baseUrl)) return;
+    if (!window.location.href.startsWith(baseUrl)) {
+      callback({ success: false, error: 'Open a page inside the configured Moodle URL before capturing.' });
+      return;
+    }
 
     // Skip course overview/section pages — they list activities, not content
-    if (isCourseOverviewPage()) return;
+    if (isCourseOverviewPage()) {
+      callback({ success: false, error: 'Open a Moodle activity or lesson page instead of the course overview.' });
+      return;
+    }
 
     const { courseName, courseId } = extractCourseInfo();
-    // Skip pages where we can't identify the course (dashboard, profile, etc.)
-    if (courseId === 'unknown') return;
+    if (courseId === 'unknown') {
+      callback({ success: false, error: 'Could not identify the Moodle course for this page.' });
+      return;
+    }
 
     const { moduleName, moduleType } = extractModuleInfo();
     const genericContent = extractContent();
@@ -405,9 +418,11 @@ function capture() {
     const contentParts = [genericContent, quizContent].filter(Boolean);
     const content = contentParts.join('\n\n');
 
-    if (!content || content.length < 20) return;
+    if (!content || content.length < 20) {
+      callback({ success: false, error: 'No meaningful Moodle content was found on this page.' });
+      return;
+    }
 
-    // For lesson sub-pages, extract pageid so background can store per-sub-page
     let pageId = null;
     try {
       const params = new URL(window.location.href).searchParams;
@@ -428,50 +443,20 @@ function capture() {
       capturedAt: new Date().toISOString(),
     };
 
-    chrome.runtime.sendMessage({ type: 'contentCaptured', payload });
+    chrome.runtime.sendMessage({ type: 'contentCaptured', payload }, (response) => {
+      if (chrome.runtime.lastError) {
+        callback({ success: false, error: chrome.runtime.lastError.message });
+        return;
+      }
+      callback(response || { success: false, error: 'Capture failed.' });
+    });
   });
 }
 
-// Auto-capture on page load
-capture();
-
 // Respond to manual capture trigger from popup/background
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'startCapture') {
-    capture();
-    sendResponse({ success: true });
+  if (message.type === 'captureCurrentPage') {
+    captureCurrentPage(sendResponse);
     return true;
   }
 });
-
-// React to capture being enabled — attempt capture on all Moodle tabs immediately.
-// Safe because capture() skips pages where courseId is 'unknown'.
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes.isCapturing && changes.isCapturing.newValue === true) {
-    capture();
-  }
-});
-
-// SPA navigation detection — capture on URL changes via pushState/popstate
-let _lastUrl = window.location.href;
-
-function checkUrlChanged() {
-  if (window.location.href !== _lastUrl) {
-    _lastUrl = window.location.href;
-    setTimeout(capture, 500);
-  }
-}
-
-window.addEventListener('popstate', checkUrlChanged);
-
-const _origPushState = history.pushState;
-history.pushState = function (...args) {
-  _origPushState.apply(this, args);
-  checkUrlChanged();
-};
-
-const _origReplaceState = history.replaceState;
-history.replaceState = function (...args) {
-  _origReplaceState.apply(this, args);
-  checkUrlChanged();
-};

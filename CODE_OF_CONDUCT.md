@@ -30,7 +30,7 @@ This Code of Conduct applies within all project spaces and when an individual is
 
 ## Enforcement
 
-If you experience or witness unacceptable behavior, contact the project maintainer through GitHub.
+If you experience or witness unacceptable behavior, contact Fernando Paladini through GitHub or by email at fnpaladini@gmail.com.
 
 ## Attribution
 

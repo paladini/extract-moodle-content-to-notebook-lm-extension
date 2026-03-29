@@ -50,12 +50,13 @@ cd extract-moodle-content-to-notebook-lm-extension
 This is the workflow that has been working well in practice:
 
 1. Open the extension and configure your Moodle base URL.
-2. Start capture.
-3. Browse the Moodle course normally until the relevant lessons and pages are captured.
-4. Export the course as Markdown.
-5. In NotebookLM, create a new notebook.
-6. Upload the course syllabus and the Markdown exported by this extension.
-7. Ask Gemini inside NotebookLM to generate flashcards.
+2. Open a Moodle lesson or activity page.
+3. Click Capture Current Page.
+4. Repeat for the pages you want to save.
+5. Export the course as Markdown.
+6. In NotebookLM, create a new notebook.
+7. Upload the course syllabus and the Markdown exported by this extension.
+8. Ask Gemini inside NotebookLM to generate flashcards.
 
 In English, “plano de ensino” is usually best translated as “course syllabus” or simply “syllabus”. If you want the README and site copy to sound more academic, “course syllabus” is the safer wording.
 
@@ -63,9 +64,9 @@ In English, “plano de ensino” is usually best translated as “course syllab
 
 1. Click the extension icon.
 2. Save your Moodle base URL, for example `https://moodle.example.edu`.
-3. Click Start Capture.
-4. Browse Moodle pages normally.
-5. Click Stop Capture when you are done.
+3. Open the Moodle page you want to save.
+4. Click Capture Current Page.
+5. Repeat on each lesson or activity page you want to include.
 6. Export a single course or use Export All.
 7. Optionally export a JSON backup or restore from a previous backup.
 
@@ -136,6 +137,9 @@ Public pages for GitHub Pages and store links live in [docs/index.html](docs/ind
 ## Author
 
 Fernando Paladini
+
+- GitHub: https://github.com/paladini
+- Email: fnpaladini@gmail.com
 
 ## License
 

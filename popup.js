@@ -125,26 +125,26 @@ function checkStorageQuota() {
 
 // ─── Badge ───
 
-function updateBadge(isCapturing, courses) {
+function updateBadge(courses) {
   if (!chrome.action) return;
-  if (isCapturing) {
-    const total = countModules(courses);
-    chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
+  const total = countModules(courses);
+  chrome.action.setBadgeText({ text: total > 0 ? String(total) : '' });
+  if (total > 0) {
     chrome.action.setBadgeBackgroundColor({ color: '#4ecca3' });
-  } else {
-    chrome.action.setBadgeText({ text: '' });
   }
 }
 
 // ─── Capture UI ───
 
-function setCaptureUI(isCapturing, hasMoodleUrl) {
-  $dot.className = `status-dot ${isCapturing ? 'capturing' : 'idle'}`;
-  $statusText.textContent = isCapturing ? 'Capturing...' : 'Idle';
-  $capture.textContent = isCapturing ? 'Stop Capture' : 'Start Capture';
-  $capture.classList.toggle('active', isCapturing);
+function setCaptureUI(hasMoodleUrl, isBusy = false) {
+  $dot.className = `status-dot ${isBusy ? 'capturing' : 'idle'}`;
+  $statusText.textContent = isBusy ? 'Capturing page...' : 'Ready';
+  $capture.textContent = 'Capture Current Page';
+  $capture.classList.toggle('active', isBusy);
   $capture.disabled = !hasMoodleUrl;
-  $captureHint.textContent = hasMoodleUrl ? '' : 'Set your Moodle URL above to enable capture.';
+  $captureHint.textContent = hasMoodleUrl
+    ? 'Captures only the current Moodle page when you click the button.'
+    : 'Set your Moodle URL above to enable page capture.';
 }
 
 // ─── Render course list ───
@@ -231,12 +231,12 @@ function renderCourses(courses) {
 // ─── Refresh full UI from storage ───
 
 function refreshUI() {
-  chrome.storage.local.get(['moodleBaseUrl', 'isCapturing', 'courses'], (data) => {
+  chrome.storage.local.get(['moodleBaseUrl', 'courses'], (data) => {
     const hasMoodleUrl = !!data.moodleBaseUrl;
     $url.value = data.moodleBaseUrl || '';
-    setCaptureUI(!!data.isCapturing, hasMoodleUrl);
+    setCaptureUI(hasMoodleUrl, false);
     renderCourses(data.courses || {});
-    updateBadge(!!data.isCapturing, data.courses || {});
+    updateBadge(data.courses || {});
     checkStorageQuota();
 
     chrome.runtime.sendMessage({ type: 'getSnapshotStatus' }, (resp) => {
@@ -269,28 +269,38 @@ $url.addEventListener('keydown', (e) => {
 });
 
 $capture.addEventListener('click', () => {
-  chrome.storage.local.get(['isCapturing'], (data) => {
-    const newState = !data.isCapturing;
-    chrome.storage.local.set({ isCapturing: newState }, () => {
-      refreshUI();
-      if (newState) {
-        showToast('Capture started. Browse your Moodle courses.', 'success');
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs[0]?.id) {
-            const tabId = tabs[0].id;
-            chrome.tabs.sendMessage(tabId, { type: 'startCapture' }).catch(() => {
-              chrome.scripting.executeScript({
-                target: { tabId },
-                files: ['content.js'],
-              }).catch((err) => {
-                showToast('Could not inject into this tab. Navigate to Moodle first.', 'error');
-              });
-            });
-          }
-        });
-      } else {
-        showToast('Capture stopped.', 'info');
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0];
+    if (!activeTab?.id) {
+      showToast('No active tab found.', 'error');
+      return;
+    }
+
+    setCaptureUI(true, true);
+
+    chrome.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      files: ['content.js'],
+    }, () => {
+      if (chrome.runtime.lastError) {
+        setCaptureUI(!!$url.value.trim(), false);
+        showToast('Could not access this page. Open a Moodle page first.', 'error');
+        return;
       }
+
+      chrome.tabs.sendMessage(activeTab.id, { type: 'captureCurrentPage' }, (resp) => {
+        setCaptureUI(!!$url.value.trim(), false);
+        if (chrome.runtime.lastError) {
+          showToast('Capture failed on this tab.', 'error');
+          return;
+        }
+        if (resp && resp.success) {
+          showToast('Current page captured successfully.', 'success');
+          refreshUI();
+        } else {
+          showToast(resp?.error || 'Capture failed.', 'error');
+        }
+      });
     });
   });
 });

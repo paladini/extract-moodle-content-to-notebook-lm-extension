@@ -4,7 +4,7 @@
 
 Please do not open public issues for security-sensitive reports.
 
-If you believe you found a vulnerability, contact the maintainer privately through GitHub and include:
+If you believe you found a vulnerability, contact Fernando Paladini privately through GitHub or by email at fnpaladini@gmail.com and include:
 
 - A clear description of the issue.
 - Steps to reproduce it.
@@ -22,4 +22,4 @@ Relevant security reports include, for example:
 
 ## Response
 
-The maintainer will review reports and aim to confirm, prioritize, and address valid issues as quickly as practical.
+Fernando Paladini will review reports and aim to confirm, prioritize, and address valid issues as quickly as practical.
