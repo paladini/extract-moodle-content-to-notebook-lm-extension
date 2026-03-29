@@ -6,7 +6,7 @@ Extensão para capturar conteúdo do Moodle e exportar em Markdown pronto para N
 
 ## O que esta extensão faz
 
-Enquanto você navega pelo Moodle, a extensão captura o conteúdo das páginas, organiza tudo por curso e módulo e depois exporta em Markdown.
+Ao clicar em Capture Current Page, a extensão captura manualmente a página atual do Moodle, organiza tudo por curso e módulo e depois exporta em Markdown.
 
 Isso facilita um fluxo de estudo com IA sem depender de copiar e colar manualmente cada página.
 
