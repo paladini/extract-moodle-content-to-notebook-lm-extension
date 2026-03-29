@@ -118,7 +118,6 @@ The extension now includes stronger local recovery features:
 ├── icons/
 ├── .github/
 ├── docs/
-├── site/
 ├── README.md
 ├── README.pt-BR.md
 ├── CONTRIBUTING.md
