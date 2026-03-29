@@ -20,6 +20,11 @@ package-lock.json
 
 # Test/sample pages
 pages/
+.private/
+2026-1-cead-topicos-especiais-i.md
+Tópicos Especiais I _ UDESC.edu.html
+Tópicos Especiais I _ UDESC.edu_files/
+pagina_com_questionario/
 
 # Windsurf plans
 .windsurf/

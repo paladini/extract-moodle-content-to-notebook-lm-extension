@@ -130,8 +130,6 @@ The extension now includes stronger local recovery features:
 
 If you want to contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and the issue templates in [.github/ISSUE_TEMPLATE](.github/ISSUE_TEMPLATE).
 
-For publishing guidance, see [docs/chrome-web-store-release.md](docs/chrome-web-store-release.md).
-
 Public pages for GitHub Pages and store links live in [docs/index.html](docs/index.html), [docs/privacy.html](docs/privacy.html), and [docs/permissions.html](docs/permissions.html).
 
 ## Author
