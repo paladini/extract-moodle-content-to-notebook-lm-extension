@@ -59,8 +59,8 @@
 
         <h2><code>scripting</code></h2>
         <p>
-          Enables dynamic script injection. When capture mode is activated, the extension injects its detection logic
-          into all visible tabs. Future tabs are automatically injected while capture remains active.
+          Enables dynamic script injection after explicit user action through the extension UI.
+          Combined with <code>activeTab</code>, this supports on-demand capture access instead of broad host access.
         </p>
 
         <h2>How capture mode works</h2>
@@ -68,11 +68,11 @@
           When you click "Start Capture", the extension:
         </p>
         <ol>
-          <li>Injects a detection script into all open tabs</li>
-          <li>Monitors new tabs and auto-injects while capture is enabled</li>
-          <li>Each injected script detects whether the page belongs to your configured Moodle instance</li>
-          <li>If detected, it automatically captures lesson and activity content</li>
-          <li>When you click "Stop Capture", injection stops for new tabs</li>
+          <li>Enables capture mode through explicit user action</li>
+          <li>Injects detection logic on demand instead of using static global host matches</li>
+          <li>The script checks whether the current page matches the configured Moodle base URL</li>
+          <li>If matched, it captures lesson and activity content into local storage</li>
+          <li>When you click "Stop Capture", no new captures are performed</li>
         </ol>
 
         <h2>Data handling summary</h2>

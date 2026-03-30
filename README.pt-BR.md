@@ -6,7 +6,7 @@ Extensão para capturar conteúdo do Moodle e exportar em Markdown pronto para N
 
 ## O que esta extensão faz
 
-Ao ativar o modo de captura, a extensão registra automaticamente o conteúdo das páginas do Moodle enquanto você navega, organiza tudo por curso e módulo e depois exporta em Markdown.
+Ao ativar o modo de captura, a extensão registra automaticamente o conteúdo das páginas do Moodle enquanto você navega em abas com acesso concedido por ação explícita do usuário, organiza tudo por curso e módulo e depois exporta em Markdown.
 
 Isso facilita um fluxo de estudo com IA sem depender de copiar e colar manualmente cada página.
 
@@ -47,7 +47,7 @@ cd extract-moodle-content-to-notebook-lm-extension
 
 ## Recursos principais
 
-- Captura automática enquanto você navega pelas páginas do Moodle com o modo de captura ativado.
+- Captura automática enquanto você navega pelas páginas do Moodle em abas com acesso de captura habilitado.
 - Organização por curso e módulo.
 - Exportação em Markdown por curso.
 - Captura de vídeos e links de arquivos.
@@ -66,13 +66,13 @@ cd extract-moodle-content-to-notebook-lm-extension
 
 A extensão usa **permissões mínimas e dinâmicas**:
 
-- **`activeTab`** + **`scripting`**: Scripts são injetados apenas quando você clica em "Start Capture", não continuamente em todas as páginas.
+- **`activeTab`** + **`scripting`**: Scripts são injetados dinamicamente após ação explícita do usuário. A extensão não usa content script estático em todas as páginas.
 - **`storage`**: Armazenamento local no navegador para cursos e configurações capturados.
 - **`downloads`**: Funcionalidade de exportação para arquivos Markdown e backup em JSON.
 
 **Os dados são processados inteiramente no seu navegador.** Nenhuma comunicação com servidor externo ocorre. O conteúdo fica no armazenamento local do navegador e só é enviado para fora quando você exporta explicitamente.
 
-Para mais detalhas, consulte [docs/permissions.html](docs/permissions.html).
+Para mais detalhes, consulte [docs/permissions.html](docs/permissions.html).
 
 ## Contribuição
 

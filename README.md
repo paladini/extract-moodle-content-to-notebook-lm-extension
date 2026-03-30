@@ -17,13 +17,13 @@ Turn Moodle pages into clean Markdown for NotebookLM, flashcards, summaries, and
 
 ## Why this exists
 
-Moodle content is usually fragmented across lessons, pages, files, and embedded videos. This extension captures that material automatically while you browse Moodle pages after enabling capture mode, then exports each course as a structured Markdown file designed to work well with NotebookLM.
+Moodle content is usually fragmented across lessons, pages, files, and embedded videos. This extension captures that material while you browse Moodle pages in tabs where capture access was enabled by user action, then exports each course as a structured Markdown file designed to work well with NotebookLM.
 
 The result is a smoother study workflow: collect content once, export once, and reuse it for summaries, Q&A, flashcards, and revision.
 
 ## Features
 
-- Automatic capture while you browse Moodle pages after enabling capture mode.
+- Automatic capture while you browse Moodle pages in tabs where capture access was enabled.
 - Course and module grouping based on Moodle breadcrumbs and page context.
 - Per-course Markdown exports ready for NotebookLM.
 - Extraction of videos and attachment links such as PDF, DOCX, and PPTX.
@@ -104,7 +104,7 @@ The extension now includes stronger local recovery features:
 
 The extension uses **minimal, dynamic permissions**:
 
-- **`activeTab`** + **`scripting`**: Scripts are injected only when you click "Start Capture", not continuously on all pages.
+- **`activeTab`** + **`scripting`**: Scripts are injected dynamically after explicit user action. The extension does not run a static content script on all pages.
 - **`storage`**: Local browser storage for captured courses and settings.
 - **`downloads`**: Export functionality for Markdown and JSON backup files.
 
