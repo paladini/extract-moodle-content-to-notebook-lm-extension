@@ -51,12 +51,29 @@
           Used to export captured data as Markdown files and to export JSON backups when the user clicks export actions.
         </p>
 
-        <h2>Why the extension runs on pages</h2>
+        <h2><code>activeTab</code></h2>
         <p>
-          The extension runs its content script on pages the user opens so it can detect whether
-          they belong to the configured Moodle instance. It only records Moodle lesson and activity
-          content while capture mode is enabled by the user.
+          Allows the extension to inject its content script dynamically when the user clicks "Start Capture" in the popup.
+          This reduces the scope of permissions compared to a static content script running on all pages.
         </p>
+
+        <h2><code>scripting</code></h2>
+        <p>
+          Enables dynamic script injection. When capture mode is activated, the extension injects its detection logic
+          into all visible tabs. Future tabs are automatically injected while capture remains active.
+        </p>
+
+        <h2>How capture mode works</h2>
+        <p>
+          When you click "Start Capture", the extension:
+        </p>
+        <ol>
+          <li>Injects a detection script into all open tabs</li>
+          <li>Monitors new tabs and auto-injects while capture is enabled</li>
+          <li>Each injected script detects whether the page belongs to your configured Moodle instance</li>
+          <li>If detected, it automatically captures lesson and activity content</li>
+          <li>When you click "Stop Capture", injection stops for new tabs</li>
+        </ol>
 
         <h2>Data handling summary</h2>
         <ul>

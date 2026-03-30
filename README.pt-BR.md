@@ -62,6 +62,18 @@ cd extract-moodle-content-to-notebook-lm-extension
 - Snapshot automático antes de limpar dados.
 - Exportação e importação de backup em JSON.
 
+## Privacidade e Permissões
+
+A extensão usa **permissões mínimas e dinâmicas**:
+
+- **`activeTab`** + **`scripting`**: Scripts são injetados apenas quando você clica em "Start Capture", não continuamente em todas as páginas.
+- **`storage`**: Armazenamento local no navegador para cursos e configurações capturados.
+- **`downloads`**: Funcionalidade de exportação para arquivos Markdown e backup em JSON.
+
+**Os dados são processados inteiramente no seu navegador.** Nenhuma comunicação com servidor externo ocorre. O conteúdo fica no armazenamento local do navegador e só é enviado para fora quando você exporta explicitamente.
+
+Para mais detalhas, consulte [docs/permissions.html](docs/permissions.html).
+
 ## Contribuição
 
 Leia [CONTRIBUTING.pt-BR.md](CONTRIBUTING.pt-BR.md) ou [CONTRIBUTING.md](CONTRIBUTING.md).

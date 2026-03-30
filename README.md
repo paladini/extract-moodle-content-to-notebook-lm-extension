@@ -100,6 +100,18 @@ The extension now includes stronger local recovery features:
 - JSON backup export and import.
 - Manual restore of the latest snapshot.
 
+## Privacy & Permissions
+
+The extension uses **minimal, dynamic permissions**:
+
+- **`activeTab`** + **`scripting`**: Scripts are injected only when you click "Start Capture", not continuously on all pages.
+- **`storage`**: Local browser storage for captured courses and settings.
+- **`downloads`**: Export functionality for Markdown and JSON backup files.
+
+**Data is processed entirely locally.** No external backend or server communication occurs. Content is stored in your browser's local storage and only sent elsewhere when you explicitly export files.
+
+For full details, see [docs/permissions.html](docs/permissions.html).
+
 ## How it works
 
 1. `content.js` detects Moodle pages and extracts content.

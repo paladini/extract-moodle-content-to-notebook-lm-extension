@@ -270,12 +270,33 @@ $url.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') saveUrl();
 });
 
+async function injectContentScript() {
+  try {
+    const tabs = await new Promise((resolve) => {
+      chrome.tabs.query({}, resolve);
+    });
+    for (const tab of tabs) {
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content.js'],
+        });
+      } catch (err) {
+        console.debug(`Failed to inject in tab ${tab.id}:`, err.message);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to inject content script:', err);
+  }
+}
+
 $capture.addEventListener('click', () => {
   chrome.storage.local.get(['isCapturing'], (data) => {
     const newState = !data.isCapturing;
-    chrome.storage.local.set({ isCapturing: newState }, () => {
+    chrome.storage.local.set({ isCapturing: newState }, async () => {
       refreshUI();
       if (newState) {
+        await injectContentScript();
         showToast('Capture started. Browse your Moodle courses.', 'success');
       } else {
         showToast('Capture stopped.', 'info');

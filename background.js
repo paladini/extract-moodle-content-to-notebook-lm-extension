@@ -500,6 +500,49 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
+// Inject content script into all existing tabs when isCapturing becomes true
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local' || !changes.isCapturing) return;
+  if (!changes.isCapturing.newValue) return;
+
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach((tab) => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tab.id },
+          files: ['content.js'],
+        },
+        (result) => {
+          if (chrome.runtime.lastError) {
+            console.debug(`Failed to inject in tab ${tab.id}:`, chrome.runtime.lastError.message);
+          }
+        }
+      );
+    });
+  });
+});
+
+// Inject content script into new tabs if capture mode is enabled
+chrome.tabs.onCreated.addListener((tab) => {
+  chrome.storage.local.get(['isCapturing'], (data) => {
+    if (data.isCapturing) {
+      setTimeout(() => {
+        chrome.scripting.executeScript(
+          {
+            target: { tabId: tab.id },
+            files: ['content.js'],
+          },
+          (result) => {
+            if (chrome.runtime.lastError) {
+              console.debug(`Failed to inject in new tab ${tab.id}:`, chrome.runtime.lastError.message);
+            }
+          }
+        );
+      }, 100);
+    }
+  });
+});
+
 // Initialise default state on install — merge, never overwrite existing data
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.get(['moodleBaseUrl', 'isCapturing', 'courses'], (data) => {
