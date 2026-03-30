@@ -378,14 +378,64 @@ function extractContent() {
 }
 
 /**
- * Main capture routine. Validates context, extracts structured data,
+ * Extracts structured data from the current page and returns it.
+ */
+function buildCapturePayload() {
+  if (!isMoodlePage()) {
+    return { success: false, error: 'This page does not look like a Moodle content page.' };
+  }
+
+  if (isCourseOverviewPage()) {
+    return { success: false, error: 'Open a Moodle activity or lesson page instead of the course overview.' };
+  }
+
+  const { courseName, courseId } = extractCourseInfo();
+  if (courseId === 'unknown') {
+    return { success: false, error: 'Could not identify the Moodle course for this page.' };
+  }
+
+  const { moduleName, moduleType } = extractModuleInfo();
+  const genericContent = extractContent();
+  const quizContent = extractQuizContent();
+
+  const contentParts = [genericContent, quizContent].filter(Boolean);
+  const content = contentParts.join('\n\n');
+
+  if (!content || content.length < 20) {
+    return { success: false, error: 'No meaningful Moodle content was found on this page.' };
+  }
+
+  let pageId = null;
+  try {
+    const params = new URL(window.location.href).searchParams;
+    if (window.location.pathname.includes('/mod/lesson/')) {
+      pageId = params.get('pageid') || '_entry';
+    }
+  } catch {
+    // Ignore URL parsing failures and use the current page as-is.
+  }
+
+  return {
+    success: true,
+    payload: {
+      courseName,
+      courseId,
+      moduleName,
+      moduleType,
+      content,
+      pageId,
+      url: window.location.href,
+      normalizedUrl: normalizeModuleUrl(window.location.href),
+      capturedAt: new Date().toISOString(),
+    },
+  };
+}
+
+/**
+ * Main manual capture routine. Validates context, extracts structured data,
  * and sends it to the background service worker for storage.
  */
 function captureCurrentPage(callback = () => {}) {
-  if (!isMoodlePage()) {
-    callback({ success: false, error: 'This page does not look like a Moodle content page.' });
-    return;
-  }
 
   chrome.storage.local.get(['moodleBaseUrl'], (data) => {
     if (!data.moodleBaseUrl) {
@@ -399,51 +449,13 @@ function captureCurrentPage(callback = () => {}) {
       return;
     }
 
-    // Skip course overview/section pages — they list activities, not content
-    if (isCourseOverviewPage()) {
-      callback({ success: false, error: 'Open a Moodle activity or lesson page instead of the course overview.' });
+    const result = buildCapturePayload();
+    if (!result.success) {
+      callback(result);
       return;
     }
 
-    const { courseName, courseId } = extractCourseInfo();
-    if (courseId === 'unknown') {
-      callback({ success: false, error: 'Could not identify the Moodle course for this page.' });
-      return;
-    }
-
-    const { moduleName, moduleType } = extractModuleInfo();
-    const genericContent = extractContent();
-    const quizContent = extractQuizContent();
-
-    const contentParts = [genericContent, quizContent].filter(Boolean);
-    const content = contentParts.join('\n\n');
-
-    if (!content || content.length < 20) {
-      callback({ success: false, error: 'No meaningful Moodle content was found on this page.' });
-      return;
-    }
-
-    let pageId = null;
-    try {
-      const params = new URL(window.location.href).searchParams;
-      if (window.location.pathname.includes('/mod/lesson/')) {
-        pageId = params.get('pageid') || '_entry';
-      }
-    } catch { /* ignore */ }
-
-    const payload = {
-      courseName,
-      courseId,
-      moduleName,
-      moduleType,
-      content,
-      pageId,
-      url: window.location.href,
-      normalizedUrl: normalizeModuleUrl(window.location.href),
-      capturedAt: new Date().toISOString(),
-    };
-
-    chrome.runtime.sendMessage({ type: 'contentCaptured', payload }, (response) => {
+    chrome.runtime.sendMessage({ type: 'contentCaptured', payload: result.payload }, (response) => {
       if (chrome.runtime.lastError) {
         callback({ success: false, error: chrome.runtime.lastError.message });
         return;
@@ -453,10 +465,66 @@ function captureCurrentPage(callback = () => {}) {
   });
 }
 
-// Respond to manual capture trigger from popup/background
+/**
+ * Automatic capture routine used while capture mode is enabled.
+ */
+function capture() {
+  if (!isMoodlePage()) return;
+
+  chrome.storage.local.get(['moodleBaseUrl', 'isCapturing'], (data) => {
+    if (!data.isCapturing) return;
+    if (!data.moodleBaseUrl) return;
+
+    const baseUrl = data.moodleBaseUrl.replace(/\/+$/, '');
+    if (!window.location.href.startsWith(baseUrl)) return;
+
+    const result = buildCapturePayload();
+    if (!result.success) return;
+
+    chrome.runtime.sendMessage({ type: 'contentCaptured', payload: result.payload });
+  });
+}
+
+capture();
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === 'startCapture') {
+    capture();
+    sendResponse({ success: true });
+    return true;
+  }
+
   if (message.type === 'captureCurrentPage') {
     captureCurrentPage(sendResponse);
     return true;
   }
 });
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.isCapturing && changes.isCapturing.newValue === true) {
+    capture();
+  }
+});
+
+let _lastUrl = window.location.href;
+
+function checkUrlChanged() {
+  if (window.location.href !== _lastUrl) {
+    _lastUrl = window.location.href;
+    setTimeout(capture, 500);
+  }
+}
+
+window.addEventListener('popstate', checkUrlChanged);
+
+const _origPushState = history.pushState;
+history.pushState = function (...args) {
+  _origPushState.apply(this, args);
+  checkUrlChanged();
+};
+
+const _origReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+  _origReplaceState.apply(this, args);
+  checkUrlChanged();
+};

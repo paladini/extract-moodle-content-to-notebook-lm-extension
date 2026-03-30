@@ -46,27 +46,16 @@
           and recovery snapshots locally inside the browser.
         </p>
 
-        <h2><code>activeTab</code></h2>
-        <p>
-          Used to interact with the current tab when the user clicks the extension on a Moodle page.
-          This keeps access limited to the page the user is actively viewing instead of requiring broad permanent host access.
-        </p>
-
-        <h2><code>scripting</code></h2>
-        <p>
-          Used to inject the extraction logic into the current tab only when the user requests a capture.
-          This lets the extension read the visible Moodle content and save it locally without automatic page-wide injection.
-        </p>
-
         <h2><code>downloads</code></h2>
         <p>
           Used to export captured data as Markdown files and to export JSON backups when the user clicks export actions.
         </p>
 
-        <h2>Why the extension injects on pages</h2>
+        <h2>Why the extension runs on pages</h2>
         <p>
-          The extension injects only on the current page after a user action in the popup.
-          It then checks whether the page matches Moodle structure and extracts content only from that page.
+          The extension runs its content script on pages the user opens so it can detect whether
+          they belong to the configured Moodle instance. It only records Moodle lesson and activity
+          content while capture mode is enabled by the user.
         </p>
 
         <h2>Data handling summary</h2>

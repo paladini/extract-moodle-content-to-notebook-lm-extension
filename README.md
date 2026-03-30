@@ -17,13 +17,13 @@ Turn Moodle pages into clean Markdown for NotebookLM, flashcards, summaries, and
 
 ## Why this exists
 
-Moodle content is usually fragmented across lessons, pages, files, and embedded videos. This extension captures that material page by page when you explicitly click Capture Current Page, then exports each course as a structured Markdown file designed to work well with NotebookLM.
+Moodle content is usually fragmented across lessons, pages, files, and embedded videos. This extension captures that material automatically while you browse Moodle pages after enabling capture mode, then exports each course as a structured Markdown file designed to work well with NotebookLM.
 
 The result is a smoother study workflow: collect content once, export once, and reuse it for summaries, Q&A, flashcards, and revision.
 
 ## Features
 
-- Manual capture of the current Moodle page after explicit user action.
+- Automatic capture while you browse Moodle pages after enabling capture mode.
 - Course and module grouping based on Moodle breadcrumbs and page context.
 - Per-course Markdown exports ready for NotebookLM.
 - Extraction of videos and attachment links such as PDF, DOCX, and PPTX.
@@ -50,9 +50,9 @@ cd extract-moodle-content-to-notebook-lm-extension
 This is the workflow that has been working well in practice:
 
 1. Open the extension and configure your Moodle base URL.
-2. Open a Moodle lesson or activity page.
-3. Click Capture Current Page.
-4. Repeat for the pages you want to save.
+2. Click Start Capture.
+3. Browse the Moodle lesson and activity pages you want to save.
+4. Stop capture when you are done browsing.
 5. Export the course as Markdown.
 6. In NotebookLM, create a new notebook.
 7. Upload the course syllabus and the Markdown exported by this extension.
@@ -64,9 +64,9 @@ In English, “plano de ensino” is usually best translated as “course syllab
 
 1. Click the extension icon.
 2. Save your Moodle base URL, for example `https://moodle.example.edu`.
-3. Open the Moodle page you want to save.
-4. Click Capture Current Page.
-5. Repeat on each lesson or activity page you want to include.
+3. Click Start Capture.
+4. Browse the Moodle lesson or activity pages you want to include.
+5. Click Stop Capture when you are done collecting content.
 6. Export a single course or use Export All.
 7. Optionally export a JSON backup or restore from a previous backup.
 

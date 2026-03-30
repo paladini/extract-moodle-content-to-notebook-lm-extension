@@ -6,7 +6,7 @@ Extensão para capturar conteúdo do Moodle e exportar em Markdown pronto para N
 
 ## O que esta extensão faz
 
-Ao clicar em Capture Current Page, a extensão captura manualmente a página atual do Moodle, organiza tudo por curso e módulo e depois exporta em Markdown.
+Ao ativar o modo de captura, a extensão registra automaticamente o conteúdo das páginas do Moodle enquanto você navega, organiza tudo por curso e módulo e depois exporta em Markdown.
 
 Isso facilita um fluxo de estudo com IA sem depender de copiar e colar manualmente cada página.
 
@@ -39,15 +39,15 @@ cd extract-moodle-content-to-notebook-lm-extension
 
 1. Abra o popup da extensão.
 2. Informe a URL base do seu Moodle.
-3. Abra a página do Moodle que você quer salvar.
-4. Clique em Capture Current Page.
-5. Repita o processo em cada lição ou atividade que quiser incluir.
+3. Clique em Start Capture.
+4. Navegue pelas lições ou atividades do Moodle que quiser incluir.
+5. Clique em Stop Capture quando terminar a coleta.
 6. Exporte um curso específico ou todos os cursos.
 7. Faça upload do Markdown no NotebookLM junto com o plano de ensino.
 
 ## Recursos principais
 
-- Captura manual da página atual.
+- Captura automática enquanto você navega pelas páginas do Moodle com o modo de captura ativado.
 - Organização por curso e módulo.
 - Exportação em Markdown por curso.
 - Captura de vídeos e links de arquivos.
