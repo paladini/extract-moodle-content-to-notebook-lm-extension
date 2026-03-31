@@ -8,6 +8,7 @@ Turn Moodle pages into clean Markdown for NotebookLM, flashcards, summaries, and
 [![Manifest V3](https://img.shields.io/badge/Manifest-V3-brightgreen.svg)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 [![Platform](https://img.shields.io/badge/Platform-Chrome%20%7C%20Edge%20%7C%20Brave-1f6feb.svg)](#installation)
 [![Open Source](https://img.shields.io/badge/Open%20Source-Yes-2da44e.svg)](#contributing)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Download-4285F4.svg)](https://chromewebstore.google.com/detail/moodle-content-extractor/dcmooninccogclmaimgbmhineffjdjda)
 
 [English](README.md) | [Portuguese (Brazil)](README.pt-BR.md)
 
@@ -32,6 +33,10 @@ The result is a smoother study workflow: collect content once, export once, and 
 - Local-first architecture: no external server required.
 
 ## Installation
+
+The extension is available on the **[Chrome Web Store](https://chromewebstore.google.com/detail/moodle-content-extractor/dcmooninccogclmaimgbmhineffjdjda)**. Install it directly from there for the easiest setup.
+
+Alternatively, you can load it manually from source:
 
 1. Clone this repository.
 
