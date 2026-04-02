@@ -107,9 +107,9 @@ The extension now includes stronger local recovery features:
 
 ## Privacy & Permissions
 
-The extension uses **minimal, dynamic permissions**:
+The extension requests the following Chrome permissions:
 
-- **`activeTab`** + **`scripting`**: Scripts are injected dynamically after explicit user action. The extension does not run a static content script on all pages.
+- **`activeTab`** + **`scripting`** + **`host_permissions` (`*://*/*`)**: The content script is automatically injected on every page while capture mode is enabled. The script immediately exits on pages that do not match your configured Moodle base URL, so browsing other sites is unaffected.
 - **`storage`**: Local browser storage for captured courses and settings.
 - **`downloads`**: Export functionality for Markdown and JSON backup files.
 

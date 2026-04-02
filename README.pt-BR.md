@@ -70,7 +70,7 @@ cd extract-moodle-content-to-notebook-lm-extension
 
 A extensão usa **permissões mínimas e dinâmicas**:
 
-- **`activeTab`** + **`scripting`**: Scripts são injetados dinamicamente após ação explícita do usuário. A extensão não usa content script estático em todas as páginas.
+- **`activeTab`** + **`scripting`** + **`host_permissions` (`*://*/*`)**: O content script é injetado automaticamente em cada página enquanto o modo de captura está ativo. O script sai imediatamente em páginas que não correspondem à URL base do Moodle configurada, portanto a navegação em outros sites não é afetada.
 - **`storage`**: Armazenamento local no navegador para cursos e configurações capturados.
 - **`downloads`**: Funcionalidade de exportação para arquivos Markdown e backup em JSON.
 

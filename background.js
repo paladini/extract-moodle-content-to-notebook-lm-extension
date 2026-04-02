@@ -273,6 +273,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           courses[p.courseId].modules[moduleKey] = mod;
         }
 
+        // Discard corrupt/empty module records that would cause a crash
+        // (e.g. bare {} objects left by edge cases in older storage writes)
+        if (mod && !mod.moduleName && !hasSubPages(mod)) {
+          mod = undefined;
+          delete courses[p.courseId].modules[moduleKey];
+        }
+
         if (!mod) {
           // First sub-page of a new lesson
           courses[p.courseId].modules[moduleKey] = {
@@ -519,6 +526,23 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         }
       );
     });
+  });
+});
+
+// Re-inject content script when a tab finishes navigating to a new page
+// (handles lesson-page-to-lesson-page navigation within the same tab)
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (changeInfo.status !== 'complete') return;
+  chrome.storage.local.get(['isCapturing'], (data) => {
+    if (!data.isCapturing) return;
+    chrome.scripting.executeScript(
+      { target: { tabId }, files: ['content.js'] },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.debug(`Failed to inject in tab ${tabId} on update:`, chrome.runtime.lastError.message);
+        }
+      }
+    );
   });
 });
 

@@ -83,6 +83,7 @@ function normalizeModuleUrl(url) {
     const u = new URL(url);
     if (u.pathname.includes('/mod/lesson/')) {
       u.searchParams.delete('pageid');
+      u.searchParams.delete('startlastseen');
       // Normalize continue.php (answer/feedback page) to view.php
       // so responses are grouped with their lesson module
       u.pathname = u.pathname.replace(/\/continue\.php$/, '/view.php');

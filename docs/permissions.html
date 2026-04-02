@@ -53,14 +53,25 @@
 
         <h2><code>activeTab</code></h2>
         <p>
-          Allows the extension to inject its content script dynamically when the user clicks "Start Capture" in the popup.
-          This reduces the scope of permissions compared to a static content script running on all pages.
+          Allows the extension to inject its content script into the currently active tab
+          when the user interacts with the popup (e.g. clicking "Start Capture").
         </p>
 
         <h2><code>scripting</code></h2>
         <p>
-          Enables dynamic script injection after explicit user action through the extension UI.
-          Combined with <code>activeTab</code>, this supports on-demand capture access instead of broad host access.
+          Enables dynamic script injection from the background service worker.
+          Combined with <code>host_permissions</code>, this supports automatic
+          re-injection whenever the browser navigates to a new page while capture mode is on.
+        </p>
+
+        <h2><code>host_permissions</code> (<code>*://*/*</code>)</h2>
+        <p>
+          Required so that the content script can be automatically injected on every page
+          navigation while capture mode is active. Without this permission, the background
+          service worker cannot re-inject the script when the user moves from one lesson page
+          to the next, causing content to be silently skipped.
+          The content script performs no action on pages that do not match the configured
+          Moodle base URL.
         </p>
 
         <h2>How capture mode works</h2>
@@ -69,7 +80,7 @@
         </p>
         <ol>
           <li>Enables capture mode through explicit user action</li>
-          <li>Injects detection logic on demand instead of using static global host matches</li>
+          <li>Automatically injects a detection script on each page you navigate to</li>
           <li>The script checks whether the current page matches the configured Moodle base URL</li>
           <li>If matched, it captures lesson and activity content into local storage</li>
           <li>When you click "Stop Capture", no new captures are performed</li>
