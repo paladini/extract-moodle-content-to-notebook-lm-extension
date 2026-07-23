@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 <img alt="Harness Score L1" src="https://paladini.github.io/harness-score/maturity/badge-l1.svg" height="20">
 # Moodle Content Extractor for NotebookLM
@@ -64,7 +64,7 @@ This is the workflow that has been working well in practice:
 7. Upload the course syllabus and the Markdown exported by this extension.
 8. Ask Gemini inside NotebookLM to generate flashcards.
 
-In English, â€œplano de ensinoâ€ is usually best translated as â€œcourse syllabusâ€ or simply â€œsyllabusâ€. If you want the README and site copy to sound more academic, â€œcourse syllabusâ€ is the safer wording.
+In English, ÔÇ£plano de ensinoÔÇØ is usually best translated as ÔÇ£course syllabusÔÇØ or simply ÔÇ£syllabusÔÇØ. If you want the README and site copy to sound more academic, ÔÇ£course syllabusÔÇØ is the safer wording.
 
 ## Usage
 
@@ -128,19 +128,19 @@ For full details, see [docs/permissions.html](docs/permissions.html).
 ## Project Structure
 
 ```text
-â”œâ”€â”€ manifest.json
-â”œâ”€â”€ background.js
-â”œâ”€â”€ content.js
-â”œâ”€â”€ popup.html
-â”œâ”€â”€ popup.js
-â”œâ”€â”€ icons/
-â”œâ”€â”€ .github/
-â”œâ”€â”€ docs/
-â”œâ”€â”€ README.md
-â”œâ”€â”€ README.pt-BR.md
-â”œâ”€â”€ CONTRIBUTING.md
-â”œâ”€â”€ CONTRIBUTING.pt-BR.md
-â””â”€â”€ LICENSE
+Ôö£ÔöÇÔöÇ manifest.json
+Ôö£ÔöÇÔöÇ background.js
+Ôö£ÔöÇÔöÇ content.js
+Ôö£ÔöÇÔöÇ popup.html
+Ôö£ÔöÇÔöÇ popup.js
+Ôö£ÔöÇÔöÇ icons/
+Ôö£ÔöÇÔöÇ .github/
+Ôö£ÔöÇÔöÇ docs/
+Ôö£ÔöÇÔöÇ README.md
+Ôö£ÔöÇÔöÇ README.pt-BR.md
+Ôö£ÔöÇÔöÇ CONTRIBUTING.md
+Ôö£ÔöÇÔöÇ CONTRIBUTING.pt-BR.md
+ÔööÔöÇÔöÇ LICENSE
 ```
 
 ## Open Source
