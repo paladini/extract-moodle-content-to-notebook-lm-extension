@@ -64,7 +64,7 @@ This is the workflow that has been working well in practice:
 7. Upload the course syllabus and the Markdown exported by this extension.
 8. Ask Gemini inside NotebookLM to generate flashcards.
 
-In English, ÔÇ£plano de ensinoÔÇØ is usually best translated as ÔÇ£course syllabusÔÇØ or simply ÔÇ£syllabusÔÇØ. If you want the README and site copy to sound more academic, ÔÇ£course syllabusÔÇØ is the safer wording.
+In English, “plano de ensino” is usually best translated as “course syllabus” or simply “syllabus”. If you want the README and site copy to sound more academic, “course syllabus” is the safer wording.
 
 ## Usage
 
@@ -128,19 +128,19 @@ For full details, see [docs/permissions.html](docs/permissions.html).
 ## Project Structure
 
 ```text
-Ôö£ÔöÇÔöÇ manifest.json
-Ôö£ÔöÇÔöÇ background.js
-Ôö£ÔöÇÔöÇ content.js
-Ôö£ÔöÇÔöÇ popup.html
-Ôö£ÔöÇÔöÇ popup.js
-Ôö£ÔöÇÔöÇ icons/
-Ôö£ÔöÇÔöÇ .github/
-Ôö£ÔöÇÔöÇ docs/
-Ôö£ÔöÇÔöÇ README.md
-Ôö£ÔöÇÔöÇ README.pt-BR.md
-Ôö£ÔöÇÔöÇ CONTRIBUTING.md
-Ôö£ÔöÇÔöÇ CONTRIBUTING.pt-BR.md
-ÔööÔöÇÔöÇ LICENSE
+├── manifest.json
+├── background.js
+├── content.js
+├── popup.html
+├── popup.js
+├── icons/
+├── .github/
+├── docs/
+├── README.md
+├── README.pt-BR.md
+├── CONTRIBUTING.md
+├── CONTRIBUTING.pt-BR.md
+└── LICENSE
 ```
 
 ## Open Source
